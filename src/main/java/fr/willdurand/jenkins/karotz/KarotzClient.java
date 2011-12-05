@@ -33,16 +33,6 @@ import org.xml.sax.InputSource;
 public class KarotzClient {
 
     /**
-     * API Key
-     */
-    private final static String KAROTZ_API_KEY = "8021fe73-8a57-48a6-828c-3302927b7389";
-
-    /**
-     * API Secret
-     */
-    private final static String KAROTZ_API_SECRET = "";
-
-    /**
      * Base URL for the START method (auth)
      */
     private final static String KAROTZ_URL_START = "http://api.karotz.com/api/karotz/start";
@@ -68,6 +58,17 @@ public class KarotzClient {
     private static String interactiveId = null;
 
     /**
+     * API Key
+     */
+    private String APIKey;
+    
+    /**
+     * API Secret
+     */
+    private String secretKey;
+
+    
+    /**
      * Install Id
      */
     private String installId = null;
@@ -75,8 +76,10 @@ public class KarotzClient {
     /**
      * Default constructor
      */
-    public KarotzClient(String installId) {
+    public KarotzClient(String APIKey, String secretKey, String installId) {
         this.installId = installId;
+        this.APIKey = APIKey;
+        this.secretKey = secretKey;
     }
 
     /**
@@ -103,12 +106,6 @@ public class KarotzClient {
      */
     public boolean speak(String textToSpeak, String language) {
         textToSpeak = textToSpeak.replace(" ", "+");
-        /*
-         * try { textToSpeak = URLEncoder.encode(textToSpeak, "UTF-8"); } catch
-         * (UnsupportedEncodingException e) { logger.severe("Error encoding TTS:
-         * " + e.getMessage()); }
-         */
-
         String url = KAROTZ_URL_TTS + "?action=speak&lang=" + language + "&text="
                 + textToSpeak + "&interactiveid=" + this.getInteractiveId();
 
@@ -133,15 +130,15 @@ public class KarotzClient {
     protected void requestInteractiveId() {
         Random random = new Random();
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("apikey", KAROTZ_API_KEY);
-        parameters.put("installid", this.getInstallId());
+        parameters.put("apikey", APIKey);
+        parameters.put("installid", getInstallId());
         parameters.put("once", String.valueOf(random.nextInt(99999999)));
         // See: http://stackoverflow.com/questions/732034/getting-unixtime-in-java
         parameters.put("timestamp", String.valueOf((int) (System.currentTimeMillis() / 1000L)));
 
         String url = null;
         try {
-            url = this.getSignedUrl(parameters, KAROTZ_API_SECRET);
+            url = this.getSignedUrl(parameters, secretKey);
             LOGGER.log(Level.INFO, "URL: {0}", url);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Exception catched: {0}", e.getMessage());
