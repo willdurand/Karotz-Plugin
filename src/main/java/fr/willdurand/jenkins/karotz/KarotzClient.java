@@ -7,7 +7,13 @@ import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -54,7 +60,7 @@ public class KarotzClient {
     /**
      * Logger
      */
-    private static Logger logger = Logger.getLogger(KarotzClient.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(KarotzClient.class.getName());
 
     /**
      * Interactive Id
@@ -136,14 +142,14 @@ public class KarotzClient {
         String url = null;
         try {
             url = this.getSignedUrl(parameters, KAROTZ_API_SECRET);
-            logger.info("URL: " + url);
+            LOGGER.log(Level.INFO, "URL: {0}", url);
         } catch (Exception e) {
-            logger.severe("Exception catched: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Exception catched: {0}", e.getMessage());
             interactiveId = null;
         }
 
-        URLConnection cnx = null;
-        InputStream inputStream = null;
+        URLConnection cnx;
+        InputStream inputStream;
 
         String result = null;
 
@@ -152,9 +158,9 @@ public class KarotzClient {
             cnx.connect();
             inputStream = cnx.getInputStream();
             result = IOUtils.toString(inputStream);
-            logger.info("Got: " + result);
+            LOGGER.log(Level.INFO, "Got: {0}", result);
         } catch (Exception e) {
-            logger.severe("Exception catched: " + e.toString());
+            LOGGER.log(Level.SEVERE, "Exception catched: {0}", e.toString());
             interactiveId = null;
         }
 
@@ -171,9 +177,9 @@ public class KarotzClient {
 
             value = elt.getTextContent();
 
-            logger.info("InteractiveId: " + value);
+            LOGGER.log(Level.INFO, "InteractiveId: {0}", value);
         } catch (Exception e) {
-            logger.severe("Failed to parse: " + xml);
+            LOGGER.log(Level.SEVERE, "Failed to parse: {0}", xml);
         }
 
         return value;
@@ -186,22 +192,22 @@ public class KarotzClient {
      * <code>true</code> otherwise.
      */
     protected boolean doRequest(String url) {
-        URLConnection connection = null;
+        URLConnection connection;
 
         try {
             connection = ProxyConfiguration.open(new URL(url));
         } catch (Exception e) {
             KarotzClient.interactiveId = null;
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
             return false;
         }
 
         try {
             connection.connect();
             connection.getInputStream();
-            logger.info("Connect to " + url);
+            LOGGER.log(Level.INFO, "Connect to {0}", url);
         } catch (IOException e) {
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
             KarotzClient.interactiveId = null;
             return false;
         }
@@ -219,7 +225,7 @@ public class KarotzClient {
         mac.init(secret);
         byte[] digest = mac.doFinal(data.getBytes());
 
-        return URLEncoder.encode(new String(Base64.encodeBase64String(digest)), "UTF-8").replace("%0D%0A", "");
+        return URLEncoder.encode(Base64.encodeBase64String(digest), "UTF-8").replace("%0D%0A", "");
     }
 
     /**

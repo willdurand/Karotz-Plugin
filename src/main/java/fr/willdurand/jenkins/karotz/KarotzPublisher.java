@@ -12,6 +12,7 @@ import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import org.apache.commons.lang.StringUtils;
@@ -28,7 +29,7 @@ public class KarotzPublisher extends Notifier {
     /**
      * Logger
      */
-    protected static Logger logger = Logger.getLogger(KarotzPublisher.class.getName());
+    protected static final Logger LOGGER = Logger.getLogger(KarotzPublisher.class.getName());
 
     /**
      * Install Id
@@ -141,7 +142,7 @@ public class KarotzPublisher extends Notifier {
      */
     protected void onFailure(KarotzClient client, String projectName) {
         String tts = prepareTTS("The project ${projectName} has failed", projectName);
-        logger.info("TTS (failure):" + tts);
+        LOGGER.log(Level.INFO, "TTS (failure):{0}", tts);
 
         client.speak(tts, "EN");
     }
@@ -155,7 +156,7 @@ public class KarotzPublisher extends Notifier {
      */
     protected void onUnstable(KarotzClient client, String projectName) {
         String tts = prepareTTS("The project ${projectName} is unstable", projectName);
-        logger.info("TTS (unstable):" + tts);
+        LOGGER.log(Level.INFO, "TTS (unstable):{0}", tts);
 
         client.speak(tts, "EN");
     }
@@ -168,7 +169,7 @@ public class KarotzPublisher extends Notifier {
      */
     protected void onRecover(KarotzClient client, String projectName) {
         String tts = prepareTTS("The project ${projectName} is back to stable", projectName);
-        logger.info("TTS (success):" + tts);
+        LOGGER.log(Level.INFO, "TTS (success):{0}", tts);
 
         client.speak(tts, "EN");
     }
@@ -181,7 +182,7 @@ public class KarotzPublisher extends Notifier {
      */
     protected void onSuccess(KarotzClient client, String projectName) {
         String tts = prepareTTS("The project ${projectName} is ok", projectName);
-        logger.info("TTS (success):" + tts);
+        LOGGER.log(Level.INFO, "TTS (success):{0}", tts);
 
         client.speak(tts, "EN");
     }
