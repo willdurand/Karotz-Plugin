@@ -50,13 +50,13 @@ public class KarotzPublisher extends Notifier {
      * We'll use this from the <tt>config.jelly</tt>.
      */
     public String getInstallId() {
-        return this.installId;
+        return installId;
     }
 
     @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
-        if (StringUtils.isBlank(this.getInstallId())) {
+        if (StringUtils.isBlank(getInstallId())) {
             listener.getLogger().println("No Karotz install id provided.");
             return false;
         }
@@ -66,15 +66,15 @@ public class KarotzPublisher extends Notifier {
         String projectName = build.getProject().getName();
 
         if (build.getResult() == Result.FAILURE) {
-            this.onFailure(client, projectName);
+            onFailure(client, projectName);
         } else if (build.getResult() == Result.UNSTABLE) {
-            this.onUnstable(client, projectName);
+            onUnstable(client, projectName);
         } else if (build.getResult() == Result.SUCCESS) {
             // Build recover
             if (build.getPreviousBuild() != null && build.getPreviousBuild().getResult() == Result.FAILURE) {
-                this.onRecover(client, projectName);
+                onRecover(client, projectName);
             } else {
-                this.onSuccess(client, projectName);
+                onSuccess(client, projectName);
             }
         }
 
@@ -172,7 +172,7 @@ public class KarotzPublisher extends Notifier {
         public KarotzPublisherDescriptor() {
             load();
         }
-        
+
         @Override
         public boolean configure(StaplerRequest req, JSONObject json) throws Descriptor.FormException {
             apiKey = json.getString("apiKey");

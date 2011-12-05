@@ -4,9 +4,12 @@ import hudson.ProxyConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -60,14 +63,13 @@ public class KarotzClient {
     /**
      * API Key
      */
-    private String APIKey;
-    
+    private String apiKey;
+
     /**
      * API Secret
      */
     private String secretKey;
 
-    
     /**
      * Install Id
      */
@@ -76,9 +78,9 @@ public class KarotzClient {
     /**
      * Default constructor
      */
-    public KarotzClient(String APIKey, String secretKey, String installId) {
+    public KarotzClient(String apiKey, String secretKey, String installId) {
         this.installId = installId;
-        this.APIKey = APIKey;
+        this.apiKey = apiKey;
         this.secretKey = secretKey;
     }
 
@@ -94,7 +96,7 @@ public class KarotzClient {
      */
     public String getInteractiveId() {
         if (null == KarotzClient.interactiveId) {
-            this.requestInteractiveId();
+            requestInteractiveId();
         }
         return KarotzClient.interactiveId;
     }
@@ -109,7 +111,7 @@ public class KarotzClient {
         String url = KAROTZ_URL_TTS + "?action=speak&lang=" + language + "&text="
                 + textToSpeak + "&interactiveid=" + this.getInteractiveId();
 
-        return this.doRequest(url);
+        return doRequest(url);
     }
 
     /**
@@ -119,9 +121,9 @@ public class KarotzClient {
      */
     public boolean colorize(String color) {
         String url = KAROTZ_URL_LED + "?action=pulse&color=" + color
-                + "&period=3000&pulse=500&interactiveid=" + this.getInteractiveId();
+                + "&period=3000&pulse=500&interactiveid=" + getInteractiveId();
 
-        return this.doRequest(url);
+        return doRequest(url);
     }
 
     /**
@@ -130,7 +132,7 @@ public class KarotzClient {
     protected void requestInteractiveId() {
         Random random = new Random();
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("apikey", APIKey);
+        parameters.put("apikey", apiKey);
         parameters.put("installid", getInstallId());
         parameters.put("once", String.valueOf(random.nextInt(99999999)));
         // See: http://stackoverflow.com/questions/732034/getting-unixtime-in-java
@@ -138,7 +140,7 @@ public class KarotzClient {
 
         String url = null;
         try {
-            url = this.getSignedUrl(parameters, secretKey);
+            url = getSignedUrl(parameters, secretKey);
             LOGGER.log(Level.INFO, "URL: {0}", url);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Exception catched: {0}", e.getMessage());
@@ -161,7 +163,7 @@ public class KarotzClient {
             interactiveId = null;
         }
 
-        KarotzClient.interactiveId = this.parseXML(result);
+        KarotzClient.interactiveId = parseXML(result);
     }
 
     protected String parseXML(String xml) {
@@ -183,7 +185,7 @@ public class KarotzClient {
     }
 
     /**
-     * @param String url	The URL to call.
+     * @param String url The URL to call.
      * @return boolean
      * <code>false</code> if the request has failed,
      * <code>true</code> otherwise.
@@ -212,10 +214,8 @@ public class KarotzClient {
         return true;
     }
 
-    /**
-     */
     protected String hmacSha1(String data, String secretKey)
-            throws Exception {
+            throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         Mac mac = Mac.getInstance("HmacSHA1");
         SecretKeySpec secret = new SecretKeySpec(secretKey.getBytes(), "HmacSHA1");
 
@@ -225,10 +225,7 @@ public class KarotzClient {
         return URLEncoder.encode(Base64.encodeBase64String(digest), "UTF-8").replace("%0D%0A", "");
     }
 
-    /**
-     */
-    protected String getSignedUrl(Map<String, String> params, String secretKey)
-            throws Exception {
+    protected String getSignedUrl(Map<String, String> params, String secretKey) throws Exception {
         SortedMap<String, String> sortedParams = new TreeMap<String, String>(params);
         Iterator<Map.Entry<String, String>> iter = sortedParams.entrySet().iterator();
 
@@ -240,7 +237,7 @@ public class KarotzClient {
             buffer.append("&").append(next.getKey()).append("=").append(next.getValue());
         }
 
-        String signedQuery = this.hmacSha1(buffer.toString(), secretKey);
+        String signedQuery = hmacSha1(buffer.toString(), secretKey);
         return KAROTZ_URL_START + "?" + buffer.toString() + "&signature=" + signedQuery;
     }
 }
