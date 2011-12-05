@@ -1,4 +1,4 @@
-package fr.willdurand.jenkins.karotz;
+package org.jenkinsci.plugins.karotz;
 
 import hudson.ProxyConfiguration;
 import java.io.IOException;
