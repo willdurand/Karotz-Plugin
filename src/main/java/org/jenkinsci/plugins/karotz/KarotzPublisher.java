@@ -19,7 +19,6 @@ import javax.servlet.ServletException;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -35,36 +34,15 @@ public class KarotzPublisher extends Notifier {
      */
     protected static final Logger LOGGER = Logger.getLogger(KarotzPublisher.class.getName());
 
-    /**
-     * Install Id
-     */
-    protected String installId;
-
-    // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
-    @DataBoundConstructor
-    public KarotzPublisher(String installId) {
-        this.installId = installId;
-    }
-
-    /**
-     * We'll use this from the <tt>config.jelly</tt>.
-     */
-    public String getInstallId() {
-        return installId;
-    }
-
     @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
-        if (StringUtils.isBlank(getInstallId())) {
-            listener.getLogger().println("No Karotz install id provided.");
-            return false;
-        }
 
-        KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
-        KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), getInstallId());
         String projectName = build.getProject().getName();
 
+        KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
+        KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
+        
         if (build.getResult() == Result.FAILURE) {
             onFailure(client, projectName);
         } else if (build.getResult() == Result.UNSTABLE) {
@@ -160,6 +138,8 @@ public class KarotzPublisher extends Notifier {
         private String apiKey;
 
         private String secretKey;
+        
+        private String installId;
 
         public String getApiKey() {
             return apiKey;
@@ -167,6 +147,10 @@ public class KarotzPublisher extends Notifier {
 
         public String getSecretKey() {
             return secretKey;
+        }
+
+        public String getInstallId() {
+            return installId;
         }
 
         public KarotzPublisherDescriptor() {
@@ -177,6 +161,7 @@ public class KarotzPublisher extends Notifier {
         public boolean configure(StaplerRequest req, JSONObject json) throws Descriptor.FormException {
             apiKey = json.getString("apiKey");
             secretKey = json.getString("secretKey");
+            installId = json.getString("installId");
             save();
             return true;
         }
