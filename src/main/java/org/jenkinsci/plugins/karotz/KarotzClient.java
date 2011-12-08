@@ -11,18 +11,12 @@ import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,7 +52,7 @@ public class KarotzClient {
     /**
      * Interactive Id
      */
-    private static String interactiveId = null;
+    private static String interactiveId;
 
     /**
      * API Key
@@ -73,7 +67,7 @@ public class KarotzClient {
     /**
      * Install Id
      */
-    private String installId = null;
+    private String installId;
 
     /**
      * Default constructor
@@ -91,14 +85,8 @@ public class KarotzClient {
         return installId;
     }
 
-    /**
-     * @return String
-     */
-    public String getInteractiveId() {
-        if (null == KarotzClient.interactiveId) {
-            requestInteractiveId();
-        }
-        return KarotzClient.interactiveId;
+    private boolean isInteractive() {
+        return interactiveId != null;
     }
 
     /**
@@ -107,10 +95,15 @@ public class KarotzClient {
      * @return
      */
     public boolean speak(String textToSpeak, String language) {
-        textToSpeak = textToSpeak.replace(" ", "+");
-        String url = KAROTZ_URL_TTS + "?action=speak&lang=" + language + "&text="
-                + textToSpeak + "&interactiveid=" + this.getInteractiveId();
-
+        if (!isInteractive()) {
+            return false;
+        }
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("action", "speak");
+        params.put("lang", language);
+        params.put("text", textToSpeak);
+        params.put("interactiveid", interactiveId);
+        String url = KAROTZ_URL_TTS + '?' + KarotzUtil.buildQuery(params);
         return doRequest(url);
     }
 
@@ -120,16 +113,25 @@ public class KarotzClient {
      * @return
      */
     public boolean colorize(String color) {
-        String url = KAROTZ_URL_LED + "?action=pulse&color=" + color
-                + "&period=3000&pulse=500&interactiveid=" + getInteractiveId();
-
+        if (!isInteractive()) {
+            return false;
+        }
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("action", "pulse");
+        params.put("color", color);
+        params.put("period", "3000");
+        params.put("interactiveid", interactiveId);
+        String url = KAROTZ_URL_LED + '?' + KarotzUtil.buildQuery(params);
         return doRequest(url);
     }
 
     /**
      * @see http://dev.karotz.com/api/signed.html
      */
-    protected void requestInteractiveId() {
+    public synchronized void startSession() {
+        if (interactiveId != null) {
+            return;
+        }
         Random random = new Random();
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("apikey", apiKey);
@@ -163,7 +165,7 @@ public class KarotzClient {
             interactiveId = null;
         }
 
-        KarotzClient.interactiveId = parseXML(result);
+        interactiveId = parseXML(result);
     }
 
     protected String parseXML(String xml) {
@@ -196,48 +198,31 @@ public class KarotzClient {
         try {
             connection = ProxyConfiguration.open(new URL(url));
         } catch (Exception e) {
-            KarotzClient.interactiveId = null;
+            interactiveId = null;
             LOGGER.severe(e.getMessage());
             return false;
         }
 
         try {
             connection.connect();
-            connection.getInputStream();
+            InputStream inputStream = connection.getInputStream();
+            String result = IOUtils.toString(inputStream);
             LOGGER.log(Level.INFO, "Connect to {0}", url);
+            LOGGER.log(Level.INFO, "result is {0}", result);
         } catch (IOException e) {
             LOGGER.severe(e.getMessage());
-            KarotzClient.interactiveId = null;
+            interactiveId = null;
             return false;
         }
 
         return true;
     }
 
-    protected String hmacSha1(String data, String secretKey)
+    private String getSignedUrl(Map<String, String> params, String secretKey) 
             throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-        Mac mac = Mac.getInstance("HmacSHA1");
-        SecretKeySpec secret = new SecretKeySpec(secretKey.getBytes(), "HmacSHA1");
-
-        mac.init(secret);
-        byte[] digest = mac.doFinal(data.getBytes());
-
-        return URLEncoder.encode(Base64.encodeBase64String(digest), "UTF-8").replace("%0D%0A", "");
-    }
-
-    protected String getSignedUrl(Map<String, String> params, String secretKey) throws Exception {
-        SortedMap<String, String> sortedParams = new TreeMap<String, String>(params);
-        Iterator<Map.Entry<String, String>> iter = sortedParams.entrySet().iterator();
-
-        Map.Entry<String, String> next = iter.next();
-        StringBuilder buffer = new StringBuilder(next.getKey()).append("=").append(next.getValue());
-
-        while (iter.hasNext()) {
-            next = iter.next();
-            buffer.append("&").append(next.getKey()).append("=").append(next.getValue());
-        }
-
-        String signedQuery = hmacSha1(buffer.toString(), secretKey);
-        return KAROTZ_URL_START + "?" + buffer.toString() + "&signature=" + signedQuery;
+        String q = KarotzUtil.buildQuery(params);
+        String signedQuery = KarotzUtil.doHmacSha1(secretKey, q);
+        LOGGER.log(Level.INFO, "singedQuery: [{0}]", signedQuery);
+        return String.format("%s?%s&signature=%s", KAROTZ_URL_START, q, URLEncoder.encode(signedQuery, "UTF-8"));
     }
 }

@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.karotz;
 
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
@@ -19,6 +20,7 @@ import javax.servlet.ServletException;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -34,6 +36,10 @@ public class KarotzPublisher extends Notifier {
      */
     protected static final Logger LOGGER = Logger.getLogger(KarotzPublisher.class.getName());
 
+    @DataBoundConstructor
+    public KarotzPublisher() {
+    }
+
     @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
@@ -42,7 +48,8 @@ public class KarotzPublisher extends Notifier {
 
         KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
         KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
-        
+
+        client.startSession();
         if (build.getResult() == Result.FAILURE) {
             onFailure(client, projectName);
         } else if (build.getResult() == Result.UNSTABLE) {
@@ -138,7 +145,7 @@ public class KarotzPublisher extends Notifier {
         private String apiKey;
 
         private String secretKey;
-        
+
         private String installId;
 
         public String getApiKey() {
@@ -159,9 +166,9 @@ public class KarotzPublisher extends Notifier {
 
         @Override
         public boolean configure(StaplerRequest req, JSONObject json) throws Descriptor.FormException {
-            apiKey = json.getString("apiKey");
-            secretKey = json.getString("secretKey");
-            installId = json.getString("installId");
+            apiKey = Util.fixEmptyAndTrim(json.getString("apiKey"));
+            secretKey = Util.fixEmptyAndTrim(json.getString("secretKey"));
+            installId = Util.fixEmptyAndTrim(json.getString("installId"));
             save();
             return true;
         }
