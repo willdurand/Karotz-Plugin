@@ -48,8 +48,12 @@ public class KarotzPublisher extends Notifier {
 
         KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
         KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
-
-        client.startSession();
+        try {
+            client.startInteractiveMode();
+        } catch (KarotzException ex) {
+            return true;
+        }
+        
         if (build.getResult() == Result.FAILURE) {
             onFailure(client, projectName);
         } else if (build.getResult() == Result.UNSTABLE) {
@@ -91,8 +95,11 @@ public class KarotzPublisher extends Notifier {
     protected void onFailure(KarotzClient client, String projectName) {
         String tts = prepareTTS("The project ${projectName} has failed", projectName);
         LOGGER.log(Level.INFO, "TTS (failure):{0}", tts);
-
-        client.speak(tts, "EN");
+        try {
+            client.speak(tts, "EN");
+        } catch (KarotzException e) {
+            LOGGER.log(Level.WARNING, e.getMessage());
+        }
     }
 
     /**
@@ -106,7 +113,11 @@ public class KarotzPublisher extends Notifier {
         String tts = prepareTTS("The project ${projectName} is unstable", projectName);
         LOGGER.log(Level.INFO, "TTS (unstable):{0}", tts);
 
-        client.speak(tts, "EN");
+        try {
+            client.speak(tts, "EN");
+        } catch (KarotzException e) {
+            LOGGER.log(Level.WARNING, e.getMessage());
+        }
     }
 
     /**
@@ -119,7 +130,11 @@ public class KarotzPublisher extends Notifier {
         String tts = prepareTTS("The project ${projectName} is back to stable", projectName);
         LOGGER.log(Level.INFO, "TTS (success):{0}", tts);
 
-        client.speak(tts, "EN");
+        try {
+            client.speak(tts, "EN");
+        } catch (KarotzException e) {
+            LOGGER.log(Level.WARNING, e.getMessage());
+        }
     }
 
     /**
@@ -132,7 +147,11 @@ public class KarotzPublisher extends Notifier {
         String tts = prepareTTS("The project ${projectName} is ok", projectName);
         LOGGER.log(Level.INFO, "TTS (success):{0}", tts);
 
-        client.speak(tts, "EN");
+        try {
+            client.speak(tts, "EN");
+        } catch (KarotzException e) {
+            LOGGER.log(Level.WARNING, e.getMessage());
+        }
     }
 
     /**
@@ -173,26 +192,48 @@ public class KarotzPublisher extends Notifier {
             return true;
         }
 
-        /**
-         * Performs on-the-fly validation of the form field 'install id'.
-         *
-         * @param value This parameter receives the value that the user has
-         * typed.
-         * @return Indicates the outcome of the validation. This is sent to the
-         * browser.
-         */
-        public FormValidation doCheckInstallId(@QueryParameter String value)
+        public FormValidation doCheckApiKey(@QueryParameter String value)
                 throws IOException, ServletException {
-            if (value.length() == 0) {
-                return FormValidation.error("Please set an install id");
-            }
-            if (value.length() < 10) {
-                // TODO: check the real length for the install id
-                return FormValidation.warning("Isn't the install id too short?");
-            }
-            return FormValidation.ok();
+            return FormValidation.validateRequired(value);
+        }
+        
+        public FormValidation doCheckSecretKey(@QueryParameter String value)
+                throws IOException, ServletException {
+            return FormValidation.validateRequired(value);
         }
 
+        public FormValidation doCheckInstallId(@QueryParameter String value)
+                throws IOException, ServletException {
+            return FormValidation.validateRequired(value);
+        }
+        
+        public FormValidation doStartInteractiveMode(
+                @QueryParameter String apiKey, @QueryParameter String secretKey, @QueryParameter String installId) {
+            apiKey = Util.fixEmptyAndTrim(apiKey);
+            secretKey = Util.fixEmptyAndTrim(secretKey);
+            installId = Util.fixEmptyAndTrim(installId);
+            if (apiKey == null || secretKey == null || installId == null) {
+                return FormValidation.warning("enter all settings.");
+            }
+            KarotzClient client = new KarotzClient(apiKey, secretKey, installId);
+            try { 
+                client.startInteractiveMode();
+            } catch (KarotzException e) {
+                return FormValidation.warning(e.getMessage());
+            }
+            return FormValidation.ok("OK");
+        }
+
+        public FormValidation doStopInteractiveMode() {
+            KarotzClient client = new KarotzClient(apiKey, secretKey, installId);
+            try {
+                client.stopInteractiveMode();
+            } catch (KarotzException e) {
+                return FormValidation.warning(e.getMessage());
+            }
+            return FormValidation.ok("OK");
+        }
+        
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
             // Indicates that this publisher can be used with all kinds of project types
