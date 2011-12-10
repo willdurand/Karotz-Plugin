@@ -53,7 +53,7 @@ public class KarotzPublisher extends Notifier {
         } catch (KarotzException ex) {
             return true;
         }
-        
+
         if (build.getResult() == Result.FAILURE) {
             onFailure(client, projectName);
         } else if (build.getResult() == Result.UNSTABLE) {
@@ -196,7 +196,7 @@ public class KarotzPublisher extends Notifier {
                 throws IOException, ServletException {
             return FormValidation.validateRequired(value);
         }
-        
+
         public FormValidation doCheckSecretKey(@QueryParameter String value)
                 throws IOException, ServletException {
             return FormValidation.validateRequired(value);
@@ -206,7 +206,7 @@ public class KarotzPublisher extends Notifier {
                 throws IOException, ServletException {
             return FormValidation.validateRequired(value);
         }
-        
+
         public FormValidation doStartInteractiveMode(
                 @QueryParameter String apiKey, @QueryParameter String secretKey, @QueryParameter String installId) {
             apiKey = Util.fixEmptyAndTrim(apiKey);
@@ -233,7 +233,7 @@ public class KarotzPublisher extends Notifier {
             }
             return FormValidation.ok("OK");
         }
-        
+
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
             // Indicates that this publisher can be used with all kinds of project types

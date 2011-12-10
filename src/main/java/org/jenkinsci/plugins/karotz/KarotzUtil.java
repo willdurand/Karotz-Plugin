@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
  *
  * @author sogabe
  */
-public class KarotzUtil {
+public final class KarotzUtil {
 
     private KarotzUtil() {
         // do not use
@@ -55,7 +55,7 @@ public class KarotzUtil {
         } catch (UnsupportedEncodingException e) {
             throw new KarotzException(e);
         }
-        
+
         return hmacSha1;
     }
 

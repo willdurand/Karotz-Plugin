@@ -17,19 +17,14 @@ public class KarotzClient {
     /**
      * Base URL for the START method (auth)
      */
-    private final static String KAROTZ_URL_START = "http://api.karotz.com/api/karotz/start";
+    private static final String KAROTZ_URL_START = "http://api.karotz.com/api/karotz/start";
 
-    private final static String KAROTZ_URL_INTERACTIVE_MODE = "http://api.karotz.com/api/karotz/interactivemode";
+    private static final String KAROTZ_URL_INTERACTIVE_MODE = "http://api.karotz.com/api/karotz/interactivemode";
 
     /**
      * Base URL for the TTS function
      */
-    private final static String KAROTZ_URL_TTS = "http://api.karotz.com/api/karotz/tts";
-
-    /**
-     * Base URL for the LED function
-     */
-    private final static String KAROTZ_URL_LED = "http://api.karotz.com/api/karotz/led";
+    private static final String KAROTZ_URL_TTS = "http://api.karotz.com/api/karotz/tts";
 
     /**
      * Logger
@@ -113,7 +108,7 @@ public class KarotzClient {
         String url = getSignedUrl(parameters, secretKey);
         LOGGER.log(Level.INFO, "URL: {0}", url);
 
-        String result = result = KarotzUtil.doRequest(url);
+        String result = KarotzUtil.doRequest(url);
         LOGGER.log(Level.INFO, "Got: {0}", result);
 
         interactiveId = KarotzUtil.parseXML(result, "interactiveId");
@@ -139,7 +134,7 @@ public class KarotzClient {
         if (!"OK".equalsIgnoreCase(code)) {
             throw new KarotzException("[code] " + code);
         }
-        
+
         interactiveId = null;
     }
 
