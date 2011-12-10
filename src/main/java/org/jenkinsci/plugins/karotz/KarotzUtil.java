@@ -29,15 +29,27 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- *
- * @author sogabe
+ * Utilitiy methods for Karotz.
+ * 
+ * @author Seiji Sogabe
  */
 public final class KarotzUtil {
 
+    /**
+     * COnstructor.
+     */
     private KarotzUtil() {
         // do not use
     }
 
+    /**
+     * Creates HmacSha1. 
+     * 
+     * @param secretKey SecretKey
+     * @param data target data
+     * @return HmacSha1
+     * @throws KarotzException Illegal encoding. 
+     */
     public static String doHmacSha1(String secretKey, String data) throws KarotzException {
         String hmacSha1;
         try {
@@ -59,6 +71,12 @@ public final class KarotzUtil {
         return hmacSha1;
     }
 
+    /**
+     * Builds query string.
+     * 
+     * @param params key and value pairs.
+     * @return  query string.
+     */
     public static String buildQuery(Map<String, String> params) {
         if (params == null) {
             return "";
@@ -79,6 +97,13 @@ public final class KarotzUtil {
         return buffer.toString();
     }
 
+    /**
+     * Sends cmd to Karotz using ReST.
+     * 
+     * @param url Karotz webAPI URL
+     * @return response
+     * @throws KarotzException Network or karotz trouble.  
+     */
     public static String doRequest(String url) throws KarotzException {
         if (url == null) {
             throw new KarotzException("url is null");
@@ -98,15 +123,23 @@ public final class KarotzUtil {
         return result;
     }
 
-    public static String parseXML(String xml, String tagName) throws KarotzException {
-        if (xml == null || tagName == null) {
+    /**
+     * Parses response from karotz.
+     * 
+     * @param response response from karotz
+     * @param tagName 
+     * @return tag value
+     * @throws KarotzException illega response
+     */
+    public static String parseResponse(String response, String tagName) throws KarotzException {
+        if (response == null || tagName == null) {
             throw new IllegalArgumentException("params should not be null.");
         }
 
         String value;
         try {
             DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document document = parser.parse(new InputSource(new StringReader(xml)));
+            Document document = parser.parse(new InputSource(new StringReader(response)));
             Element elt = (Element) document.getElementsByTagName(tagName).item(0);
             if (elt == null) {
                 return null;

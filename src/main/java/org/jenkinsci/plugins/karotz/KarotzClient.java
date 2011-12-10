@@ -111,9 +111,9 @@ public class KarotzClient {
         String result = KarotzUtil.doRequest(url);
         LOGGER.log(Level.INFO, "Got: {0}", result);
 
-        interactiveId = KarotzUtil.parseXML(result, "interactiveId");
+        interactiveId = KarotzUtil.parseResponse(result, "interactiveId");
         if (interactiveId == null) {
-            String code = KarotzUtil.parseXML(result, "code");
+            String code = KarotzUtil.parseResponse(result, "code");
             throw new KarotzException("[code] " + code);
         }
     }
@@ -130,7 +130,7 @@ public class KarotzClient {
 
         String result = KarotzUtil.doRequest(url);
         LOGGER.log(Level.INFO, "Got: {0}", result);
-        String code = KarotzUtil.parseXML(result, "code");
+        String code = KarotzUtil.parseResponse(result, "code");
         if (!"OK".equalsIgnoreCase(code)) {
             throw new KarotzException("[code] " + code);
         }

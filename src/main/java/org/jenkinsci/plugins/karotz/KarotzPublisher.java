@@ -14,12 +14,10 @@ import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -44,7 +42,6 @@ public class KarotzPublisher extends Notifier {
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
 
-        String projectName = build.getProject().getName();
 
         KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
         KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
@@ -54,104 +51,32 @@ public class KarotzPublisher extends Notifier {
             return true;
         }
 
+        KarotzBuildListener karotzListener = new KarotzBuildListener();
+        fire(karotzListener, client, build);
+
+        return true;
+    }
+    
+    private void fire(KarotzBuildListener listener, KarotzClient client, AbstractBuild<?, ?> build) {
+        String projectName = build.getProject().getName();
+
         if (build.getResult() == Result.FAILURE) {
-            onFailure(client, projectName);
+            listener.onFailure(client, projectName);
         } else if (build.getResult() == Result.UNSTABLE) {
-            onUnstable(client, projectName);
+            listener.onUnstable(client, projectName);
         } else if (build.getResult() == Result.SUCCESS) {
             // Build recover
             if (build.getPreviousBuild() != null && build.getPreviousBuild().getResult() == Result.FAILURE) {
-                onRecover(client, projectName);
+                listener.onRecover(client, projectName);
             } else {
-                onSuccess(client, projectName);
+                listener.onSuccess(client, projectName);
             }
         }
-
-        return true;
     }
 
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
-    }
-
-    /**
-     * Prepare the text to speak (tts) by replacing variables with their values.
-     *
-     * @param String tts
-     * @param String projectName
-     * @return String
-     */
-    protected String prepareTTS(String tts, String projectName) {
-        return StringUtils.replace(tts, "${projectName}", projectName);
-    }
-
-    /**
-     * Triggered on build failure.
-     *
-     * @param KarotzClient client	A Karotz client
-     * @param String projectName	A project name
-     */
-    protected void onFailure(KarotzClient client, String projectName) {
-        String tts = prepareTTS("The project ${projectName} has failed", projectName);
-        LOGGER.log(Level.INFO, "TTS (failure):{0}", tts);
-        try {
-            client.speak(tts, "EN");
-        } catch (KarotzException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-        }
-    }
-
-    /**
-     * Triggered on build unstable.
-     *
-     * @param KarotzClient client	A Karotz client
-     * @param String projectName	A project name
-     *
-     */
-    protected void onUnstable(KarotzClient client, String projectName) {
-        String tts = prepareTTS("The project ${projectName} is unstable", projectName);
-        LOGGER.log(Level.INFO, "TTS (unstable):{0}", tts);
-
-        try {
-            client.speak(tts, "EN");
-        } catch (KarotzException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-        }
-    }
-
-    /**
-     * Triggered on build recover.
-     *
-     * @param KarotzClient client	A Karotz client
-     * @param String projectName	A project name
-     */
-    protected void onRecover(KarotzClient client, String projectName) {
-        String tts = prepareTTS("The project ${projectName} is back to stable", projectName);
-        LOGGER.log(Level.INFO, "TTS (success):{0}", tts);
-
-        try {
-            client.speak(tts, "EN");
-        } catch (KarotzException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-        }
-    }
-
-    /**
-     * Triggered on build success.
-     *
-     * @param KarotzClient client	A Karotz client
-     * @param String projectName	A project name
-     */
-    protected void onSuccess(KarotzClient client, String projectName) {
-        String tts = prepareTTS("The project ${projectName} is ok", projectName);
-        LOGGER.log(Level.INFO, "TTS (success):{0}", tts);
-
-        try {
-            client.speak(tts, "EN");
-        } catch (KarotzException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-        }
     }
 
     /**
@@ -216,7 +141,7 @@ public class KarotzPublisher extends Notifier {
                 return FormValidation.warning("enter all settings.");
             }
             KarotzClient client = new KarotzClient(apiKey, secretKey, installId);
-            try { 
+            try {
                 client.startInteractiveMode();
             } catch (KarotzException e) {
                 return FormValidation.warning(e.getMessage());
@@ -240,9 +165,6 @@ public class KarotzPublisher extends Notifier {
             return true;
         }
 
-        /**
-         * This human readable name is used in the configuration screen.
-         */
         @Override
         public String getDisplayName() {
             return "Publish with your Karotz";
