@@ -60,13 +60,6 @@ public class KarotzClient {
         this.secretKey = secretKey;
     }
 
-    /**
-     * @return String
-     */
-    public String getInstallId() {
-        return installId;
-    }
-
     private boolean isInteractive() {
         return interactiveId != null;
     }
@@ -104,9 +97,7 @@ public class KarotzClient {
         parameters.put("once", String.valueOf(random.nextInt(99999999)));
         // See: http://stackoverflow.com/questions/732034/getting-unixtime-in-java
         parameters.put("timestamp", String.valueOf((int) (System.currentTimeMillis() / 1000L)));
-
         String url = getSignedUrl(parameters, secretKey);
-        LOGGER.log(Level.INFO, "URL: {0}", url);
 
         String result = KarotzUtil.doRequest(url);
         LOGGER.log(Level.INFO, "Got: {0}", result);
@@ -129,9 +120,8 @@ public class KarotzClient {
         String url = KAROTZ_URL_INTERACTIVE_MODE + '?' + KarotzUtil.buildQuery(parameters);
 
         String result = KarotzUtil.doRequest(url);
-        LOGGER.log(Level.INFO, "Got: {0}", result);
         String code = KarotzUtil.parseResponse(result, "code");
-        if (!"OK".equalsIgnoreCase(code)) {
+        if (!"OK".equalsIgnoreCase(code) && !"NOT_CONNECTED".equalsIgnoreCase(code)) {
             throw new KarotzException("[code] " + code);
         }
 
@@ -144,4 +134,4 @@ public class KarotzClient {
         LOGGER.log(Level.INFO, "singedQuery: [{0}]", signedQuery);
         return String.format("%s?%s&signature=%s", KAROTZ_URL_START, q, Util.rawEncode(signedQuery));
     }
-}
+} 
