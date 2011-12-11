@@ -6,11 +6,11 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * KarotzBuildListener
- * 
+ *
  * @author Seiji Sogabe
  */
 public class KarotzBuildListener {
-    
+
     /**
      * Prepare the text to speak (tts) by replacing variables with their values.
      *
@@ -21,12 +21,12 @@ public class KarotzBuildListener {
     protected String prepareTTS(String tts, String projectName) {
         return StringUtils.replace(tts, "${projectName}", projectName);
     }
-    
+
     /**
      * Triggered on build failure.
      *
-     * @param KarotzClient client	
-     * @param String projectName	
+     * @param KarotzClient client
+     * @param String projectName
      */
     protected void onFailure(KarotzClient client, String projectName) {
         String tts = prepareTTS("The project ${projectName} has failed", projectName);
@@ -41,8 +41,8 @@ public class KarotzBuildListener {
     /**
      * Triggered on build unstable.
      *
-     * @param KarotzClient client	
-     * @param String projectName	
+     * @param KarotzClient client
+     * @param String projectName
      *
      */
     protected void onUnstable(KarotzClient client, String projectName) {
@@ -59,8 +59,8 @@ public class KarotzBuildListener {
     /**
      * Triggered on build recover.
      *
-     * @param KarotzClient client	
-     * @param String projectName	
+     * @param KarotzClient client
+     * @param String projectName
      */
     protected void onRecover(KarotzClient client, String projectName) {
         String tts = prepareTTS("The project ${projectName} is back to stable", projectName);
@@ -76,8 +76,8 @@ public class KarotzBuildListener {
     /**
      * Triggered on build success.
      *
-     * @param KarotzClient client	
-     * @param String projectName	
+     * @param KarotzClient client
+     * @param String projectName
      */
     protected void onSuccess(KarotzClient client, String projectName) {
         String tts = prepareTTS("The project ${projectName} is ok", projectName);
@@ -88,6 +88,6 @@ public class KarotzBuildListener {
             LOGGER.log(Level.WARNING, e.getMessage());
         }
     }
-    
+
     private static final Logger LOGGER = Logger.getLogger(KarotzBuildListener.class.getName());
 }
