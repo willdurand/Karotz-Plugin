@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.karotz;
 
+import hudson.model.AbstractBuild;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
@@ -11,26 +12,51 @@ import org.apache.commons.lang.StringUtils;
  */
 public class KarotzBuildListener {
 
+    private final AbstractBuild<?, ?> build;
+
+    private final String projectName;
+
+    private final KarotzClient client;
+
+    /**
+     * Constructor.
+     *
+     * @param build build
+     * @param client {@link KarotzClient}
+     */
+    public KarotzBuildListener(AbstractBuild<?, ?> build, KarotzClient client) {
+        if (build == null || client == null) {
+            throw new IllegalArgumentException("build and client should not be null.");
+        }
+        this.build = build;
+        this.client = client;
+        this.projectName = build.getProject().getName();
+    }
+
     /**
      * Prepare the text to speak (tts) by replacing variables with their values.
      *
-     * @param String tts
-     * @param String projectName
-     * @return String
+     * @param textToSpeak text to speak
+     * @return the text to speak by replaced vliables
      */
-    protected String prepareTTS(String tts, String projectName) {
-        return StringUtils.replace(tts, "${projectName}", projectName);
+    private String prepareTTS(String textToSpeak) {
+        return StringUtils.replace(textToSpeak, "${projectName}", projectName);
+    }
+
+    public void onStart() {
+        String tts = prepareTTS("The project ${projectName} has started");
+        try {
+            client.speak(tts, "EN");
+        } catch (KarotzException e) {
+            LOGGER.log(Level.WARNING, e.getMessage());
+        }
     }
 
     /**
      * Triggered on build failure.
-     *
-     * @param KarotzClient client
-     * @param String projectName
      */
-    protected void onFailure(KarotzClient client, String projectName) {
-        String tts = prepareTTS("The project ${projectName} has failed", projectName);
-        LOGGER.log(Level.INFO, "TTS (failure):{0}", tts);
+    public void onFailure() {
+        String tts = prepareTTS("The project ${projectName} has failed");
         try {
             client.speak(tts, "EN");
         } catch (KarotzException e) {
@@ -40,15 +66,9 @@ public class KarotzBuildListener {
 
     /**
      * Triggered on build unstable.
-     *
-     * @param KarotzClient client
-     * @param String projectName
-     *
      */
-    protected void onUnstable(KarotzClient client, String projectName) {
-        String tts = prepareTTS("The project ${projectName} is unstable", projectName);
-        LOGGER.log(Level.INFO, "TTS (unstable):{0}", tts);
-
+    public void onUnstable() {
+        String tts = prepareTTS("The project ${projectName} is unstable");
         try {
             client.speak(tts, "EN");
         } catch (KarotzException e) {
@@ -58,14 +78,9 @@ public class KarotzBuildListener {
 
     /**
      * Triggered on build recover.
-     *
-     * @param KarotzClient client
-     * @param String projectName
      */
-    protected void onRecover(KarotzClient client, String projectName) {
-        String tts = prepareTTS("The project ${projectName} is back to stable", projectName);
-        LOGGER.log(Level.INFO, "TTS (success):{0}", tts);
-
+    public void onRecover() {
+        String tts = prepareTTS("The project ${projectName} is back to stable");
         try {
             client.speak(tts, "EN");
         } catch (KarotzException e) {
@@ -75,13 +90,9 @@ public class KarotzBuildListener {
 
     /**
      * Triggered on build success.
-     *
-     * @param KarotzClient client
-     * @param String projectName
      */
-    protected void onSuccess(KarotzClient client, String projectName) {
-        String tts = prepareTTS("The project ${projectName} is ok", projectName);
-
+    public void onSuccess() {
+        String tts = prepareTTS("The project ${projectName} is ok");
         try {
             client.speak(tts, "EN");
         } catch (KarotzException e) {

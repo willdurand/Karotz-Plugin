@@ -39,9 +39,24 @@ public class KarotzPublisher extends Notifier {
     }
 
     @Override
+    public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
+        KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
+        KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
+        try {
+            client.startInteractiveMode();
+        } catch (KarotzException ex) {
+            return true;
+        }
+
+        KarotzBuildListener karotzListener = new KarotzBuildListener(build, client);
+        karotzListener.onStart();
+
+        return true;
+    }
+
+    @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
-
 
         KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
         KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
@@ -51,25 +66,25 @@ public class KarotzPublisher extends Notifier {
             return true;
         }
 
-        KarotzBuildListener karotzListener = new KarotzBuildListener();
-        fire(karotzListener, client, build);
+        KarotzBuildListener karotzListener = new KarotzBuildListener(build, client);
+        fire(karotzListener, build);
 
         return true;
     }
-    
-    private void fire(KarotzBuildListener listener, KarotzClient client, AbstractBuild<?, ?> build) {
+
+    private void fire(KarotzBuildListener listener, AbstractBuild<?, ?> build) {
         String projectName = build.getProject().getName();
 
         if (build.getResult() == Result.FAILURE) {
-            listener.onFailure(client, projectName);
+            listener.onFailure();
         } else if (build.getResult() == Result.UNSTABLE) {
-            listener.onUnstable(client, projectName);
+            listener.onUnstable();
         } else if (build.getResult() == Result.SUCCESS) {
             // Build recover
             if (build.getPreviousBuild() != null && build.getPreviousBuild().getResult() == Result.FAILURE) {
-                listener.onRecover(client, projectName);
+                listener.onRecover();
             } else {
-                listener.onSuccess(client, projectName);
+                listener.onSuccess();
             }
         }
     }
