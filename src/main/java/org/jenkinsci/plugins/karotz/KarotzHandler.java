@@ -34,26 +34,36 @@ public interface KarotzHandler {
 
     /**
      * Triggered on build start.
+     *
+     * @param build The build in progress
      */
     void onStart(AbstractBuild<?, ?> build);
 
     /**
      * Triggered on build failure.
+     *
+     * @param build The build in progress
      */
     void onFailure(AbstractBuild<?, ?> build);
 
     /**
      * Triggered on build recover.
+     *
+     * @param build The build in progress
      */
     void onRecover(AbstractBuild<?, ?> build);
 
     /**
      * Triggered on build success.
+     *
+     * @param build The build in progress
      */
     void onSuccess(AbstractBuild<?, ?> build);
 
     /**
      * Triggered on build unstable.
+     *
+     * @param build The build in progress
      */
     void onUnstable(AbstractBuild<?, ?> build);
 

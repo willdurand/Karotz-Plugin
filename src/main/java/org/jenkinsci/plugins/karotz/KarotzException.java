@@ -30,18 +30,30 @@ package org.jenkinsci.plugins.karotz;
  */
 public class KarotzException extends Exception {
 
+    /**
+     * {@inheritDoc}
+     */
     public KarotzException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public KarotzException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public KarotzException(String message) {
         super(message);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public KarotzException() {
     }
 }

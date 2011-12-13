@@ -35,12 +35,14 @@ import org.apache.commons.lang.StringUtils;
  */
 public class KarotzBuildActionHandler implements KarotzHandler {
 
+    /**
+     * Karotz client.
+     */
     private final KarotzClient client;
 
     /**
      * Constructor.
      *
-     * @param build build
      * @param client {@link KarotzClient}
      */
     public KarotzBuildActionHandler(KarotzClient client) {
@@ -54,6 +56,7 @@ public class KarotzBuildActionHandler implements KarotzHandler {
      * Prepare the text to speak (tts) by replacing variables with their values.
      *
      * @param textToSpeak text to speak
+     * @param build The build in progress
      * @return the text to speak by replaced vliables
      */
     private String prepareTTS(String textToSpeak, AbstractBuild<?, ?> build) {
@@ -61,6 +64,11 @@ public class KarotzBuildActionHandler implements KarotzHandler {
         return StringUtils.replace(textToSpeak, "${projectName}", projectName);
     }
 
+    /**
+     * Triggered on build start.
+     *
+     * @param build The build in progress
+     */
     @Override
     public void onStart(AbstractBuild<?, ?> build) {
         String tts = prepareTTS("The project ${projectName} has started", build);
@@ -73,6 +81,8 @@ public class KarotzBuildActionHandler implements KarotzHandler {
 
     /**
      * Triggered on build failure.
+     *
+     * @param build The build in progress
      */
     @Override
     public void onFailure(AbstractBuild<?, ?> build) {
@@ -87,6 +97,8 @@ public class KarotzBuildActionHandler implements KarotzHandler {
 
     /**
      * Triggered on build unstable.
+     *
+     * @param build The build in progress
      */
     @Override
     public void onUnstable(AbstractBuild<?, ?> build) {
@@ -101,6 +113,8 @@ public class KarotzBuildActionHandler implements KarotzHandler {
 
     /**
      * Triggered on build recover.
+     *
+     * @param build The build in progress
      */
     @Override
     public void onRecover(AbstractBuild<?, ?> build) {
@@ -115,6 +129,8 @@ public class KarotzBuildActionHandler implements KarotzHandler {
 
     /**
      * Triggered on build success.
+     *
+     * @param build The build in progress
      */
     @Override
     public void onSuccess(AbstractBuild<?, ?> build) {
@@ -127,5 +143,8 @@ public class KarotzBuildActionHandler implements KarotzHandler {
         }
     }
 
+    /**
+     * Logger.
+     */
     private static final Logger LOGGER = Logger.getLogger(KarotzBuildActionHandler.class.getName());
 }

@@ -58,6 +58,10 @@ public class KarotzClient {
 
     /**
      * Default constructor
+     *
+     * @param apiKey application APIKey
+     * @param secretKey application SecretKey
+     * @param installId application Install ID
      */
     public KarotzClient(String apiKey, String secretKey, String installId) {
         this.installId = installId;
@@ -69,12 +73,6 @@ public class KarotzClient {
         return interactiveId != null;
     }
 
-    /**
-     * Speak API.
-     *
-     * @param textToSpeak
-     * @param language
-     */
     public void speak(String textToSpeak, String language) throws KarotzException {
         if (!isInteractive()) {
             return;
