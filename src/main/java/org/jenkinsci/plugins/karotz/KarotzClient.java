@@ -64,7 +64,7 @@ public class KarotzClient {
     private String installId;
 
     /**
-     * Default constructor
+     * Default constructor.
      *
      * @param apiKey application APIKey
      * @param secretKey application SecretKey

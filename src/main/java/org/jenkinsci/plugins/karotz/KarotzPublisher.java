@@ -141,13 +141,13 @@ public class KarotzPublisher extends Notifier {
 
         public FormValidation doStartInteractiveMode(
                 @QueryParameter String apiKey, @QueryParameter String secretKey, @QueryParameter String installId) {
-            apiKey = Util.fixEmptyAndTrim(apiKey);
-            secretKey = Util.fixEmptyAndTrim(secretKey);
-            installId = Util.fixEmptyAndTrim(installId);
-            if (apiKey == null || secretKey == null || installId == null) {
+            String _apiKey = Util.fixEmptyAndTrim(apiKey);
+            String _secretKey = Util.fixEmptyAndTrim(secretKey);
+            String _installId = Util.fixEmptyAndTrim(installId);
+            if (_apiKey == null || _secretKey == null || _installId == null) {
                 return FormValidation.warning("enter all settings.");
             }
-            KarotzClient client = new KarotzClient(apiKey, secretKey, installId);
+            KarotzClient client = new KarotzClient(_apiKey, _secretKey, _installId);
             try {
                 client.startInteractiveMode();
             } catch (KarotzException e) {
