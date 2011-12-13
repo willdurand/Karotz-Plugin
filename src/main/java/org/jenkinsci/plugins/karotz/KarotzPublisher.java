@@ -29,10 +29,6 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class KarotzPublisher extends Notifier {
 
-    private KarotzClient client;
-
-    private KarotzHandler handler;
-
     /**
      * Logger
      */
@@ -40,18 +36,18 @@ public class KarotzPublisher extends Notifier {
 
     @DataBoundConstructor
     public KarotzPublisher() {
-        KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
-        client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
-        handler = new KarotzBuildActionHandler(client);
     }
 
     @Override
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
+        KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
+        KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
         try {
             client.startInteractiveMode();
         } catch (KarotzException ex) {
             return true;
         }
+        KarotzHandler handler = new KarotzBuildActionHandler();
         handler.onStart(build);
         return true;
     }
@@ -59,11 +55,14 @@ public class KarotzPublisher extends Notifier {
     @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
+        KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
+        KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
         try {
             client.startInteractiveMode();
         } catch (KarotzException ex) {
             return true;
         }
+        KarotzHandler handler = new KarotzBuildActionHandler();
         fire(handler, build);
         return true;
     }

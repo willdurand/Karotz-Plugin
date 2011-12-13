@@ -1,11 +1,25 @@
 package org.jenkinsci.plugins.karotz;
 
+import hudson.ProxyConfiguration;
 import hudson.Util;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.apache.commons.io.IOUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * KarotzClient class.
@@ -19,17 +33,10 @@ public class KarotzClient {
      */
     private static final String KAROTZ_URL_START = "http://api.karotz.com/api/karotz/start";
 
+    /**
+     * Base URL for the Interactive mode method
+     */
     private static final String KAROTZ_URL_INTERACTIVE_MODE = "http://api.karotz.com/api/karotz/interactivemode";
-
-    /**
-     * Base URL for the TTS function
-     */
-    private static final String KAROTZ_URL_TTS = "http://api.karotz.com/api/karotz/tts";
-
-    /**
-     * Base URL for the LED function
-     */
-    private static final String KAROTZ_URL_LED = "http://api.karotz.com/api/karotz/led";
 
     /**
      * Logger
@@ -69,65 +76,12 @@ public class KarotzClient {
         this.secretKey = secretKey;
     }
 
-    private boolean isInteractive() {
+    public String getInteractiveId() {
+        return interactiveId;
+    }
+
+    public boolean isInteractive() {
         return interactiveId != null;
-    }
-
-    public void speak(String textToSpeak, String language) throws KarotzException {
-        if (!isInteractive()) {
-            return;
-        }
-
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("action", "speak");
-        params.put("lang", language);
-        params.put("text", textToSpeak);
-        params.put("interactiveid", interactiveId);
-        String url = KAROTZ_URL_TTS + '?' + KarotzUtil.buildQuery(params);
-
-        String result = KarotzUtil.doRequest(url);
-        String code = KarotzUtil.parseResponse(result, "code");
-        if ("OK".equalsIgnoreCase(code)) {
-            throw new KarotzException("failed to speak code: " + code);
-        }
-    }
-
-    public void pulse(String color, int period, int pulse) throws KarotzException {
-        if (!isInteractive()) {
-            return;
-        }
-
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("action", "pulse");
-        params.put("color", color);
-        params.put("period", String.valueOf(period));
-        params.put("pulse", String.valueOf(pulse));
-        params.put("interactiveid", interactiveId);
-        String url = KAROTZ_URL_LED + '?' + KarotzUtil.buildQuery(params);
-
-        String result = KarotzUtil.doRequest(url);
-        String code = KarotzUtil.parseResponse(result, "code");
-        if ("OK".equalsIgnoreCase(code)) {
-            throw new KarotzException("failed to speak code: " + code);
-        }
-    }
-
-    public void light(String color) throws KarotzException {
-        if (!isInteractive()) {
-            return;
-        }
-
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("action", "light");
-        params.put("color", color);
-        params.put("interactiveid", interactiveId);
-        String url = KAROTZ_URL_LED + '?' + KarotzUtil.buildQuery(params);
-
-        String result = KarotzUtil.doRequest(url);
-        String code = KarotzUtil.parseResponse(result, "code");
-        if ("OK".equalsIgnoreCase(code)) {
-            throw new KarotzException("failed to speak code: " + code);
-        }
     }
 
     public synchronized void startInteractiveMode() throws KarotzException {
@@ -143,12 +97,12 @@ public class KarotzClient {
         parameters.put("timestamp", String.valueOf((int) (System.currentTimeMillis() / 1000L)));
         String url = getSignedUrl(parameters, secretKey);
 
-        String result = KarotzUtil.doRequest(url);
+        String result = doRequest(url);
         LOGGER.log(Level.INFO, "Got: {0}", result);
 
-        interactiveId = KarotzUtil.parseResponse(result, "interactiveId");
+        interactiveId = parseResponse(result, "interactiveId");
         if (interactiveId == null) {
-            String code = KarotzUtil.parseResponse(result, "code");
+            String code = parseResponse(result, "code");
             throw new KarotzException("[code] " + code);
         }
     }
@@ -163,13 +117,72 @@ public class KarotzClient {
 
         String url = KAROTZ_URL_INTERACTIVE_MODE + '?' + KarotzUtil.buildQuery(parameters);
 
-        String result = KarotzUtil.doRequest(url);
-        String code = KarotzUtil.parseResponse(result, "code");
+        String result = doRequest(url);
+        String code = parseResponse(result, "code");
         if (!"OK".equalsIgnoreCase(code) && !"NOT_CONNECTED".equalsIgnoreCase(code)) {
             throw new KarotzException("[code] " + code);
         }
 
         interactiveId = null;
+    }
+
+    /**
+     * Sends cmd to Karotz using ReST.
+     *
+     * @param url Karotz webAPI URL
+     * @return response
+     * @throws KarotzException Network or karotz trouble.
+     */
+    public String doRequest(String url) throws KarotzException {
+        if (url == null) {
+            throw new KarotzException("url is null");
+        }
+
+        String result;
+        try {
+            URLConnection connection = ProxyConfiguration.open(new URL(url));
+            connection.connect();
+            InputStream inputStream = connection.getInputStream();
+            result = IOUtils.toString(inputStream);
+            LOGGER.log(Level.INFO, "result is {0}", result);
+        } catch (IOException e) {
+            throw new KarotzException(e);
+        }
+
+        return result;
+    }
+
+    /**
+     * Parses response from karotz.
+     *
+     * @param response response from karotz
+     * @param tagName
+     * @return tag value
+     * @throws KarotzException illega response
+     */
+    public String parseResponse(String response, String tagName) throws KarotzException {
+        if (response == null || tagName == null) {
+            throw new IllegalArgumentException("params should not be null.");
+        }
+
+        String value;
+        try {
+            DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = parser.parse(new InputSource(new StringReader(response)));
+            Element elt = (Element) document.getElementsByTagName(tagName).item(0);
+            if (elt == null) {
+                return null;
+            }
+            value = elt.getTextContent();
+        } catch (SAXException e) {
+            throw new KarotzException(e);
+        } catch (ParserConfigurationException e) {
+            throw new KarotzException(e);
+        } catch (IOException e) {
+            throw new KarotzException(e);
+        }
+
+        return value;
     }
 
     private String getSignedUrl(Map<String, String> params, String secretKey) throws KarotzException {

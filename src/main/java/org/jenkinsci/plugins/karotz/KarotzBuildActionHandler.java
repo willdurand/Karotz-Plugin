@@ -27,6 +27,8 @@ import hudson.model.AbstractBuild;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.karotz.action.LedLightAction;
+import org.jenkinsci.plugins.karotz.action.SpeakAction;
 
 /**
  * KarotzBuildActionHandler.
@@ -34,23 +36,6 @@ import org.apache.commons.lang.StringUtils;
  * @author Seiji Sogabe
  */
 public class KarotzBuildActionHandler implements KarotzHandler {
-
-    /**
-     * Karotz client.
-     */
-    private final KarotzClient client;
-
-    /**
-     * Constructor.
-     *
-     * @param client {@link KarotzClient}
-     */
-    public KarotzBuildActionHandler(KarotzClient client) {
-        if (client == null) {
-            throw new IllegalArgumentException("client should not be null.");
-        }
-        this.client = client;
-    }
 
     /**
      * Prepare the text to speak (tts) by replacing variables with their values.
@@ -73,7 +58,7 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     public void onStart(AbstractBuild<?, ?> build) {
         String tts = prepareTTS("The project ${projectName} has started", build);
         try {
-            client.speak(tts, "EN");
+            new SpeakAction(tts, "EN").execute();
         } catch (KarotzException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
         }
@@ -88,8 +73,8 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     public void onFailure(AbstractBuild<?, ?> build) {
         String tts = prepareTTS("The project ${projectName} has failed", build);
         try {
-            client.light("FF0000");
-            client.speak(tts, "EN");
+            new SpeakAction(tts, "EN").execute();
+            new LedLightAction("FF0000").execute();
         } catch (KarotzException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
         }
@@ -104,8 +89,8 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     public void onUnstable(AbstractBuild<?, ?> build) {
         String tts = prepareTTS("The project ${projectName} is unstable", build);
         try {
-            client.light("FFFF00");
-            client.speak(tts, "EN");
+            new SpeakAction(tts, "EN").execute();
+            new LedLightAction("FFFF00").execute();
         } catch (KarotzException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
         }
@@ -120,8 +105,8 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     public void onRecover(AbstractBuild<?, ?> build) {
         String tts = prepareTTS("The project ${projectName} is back to stable", build);
         try {
-            client.light("0000FF");
-            client.speak(tts, "EN");
+            new SpeakAction(tts, "EN").execute();
+            new LedLightAction("0000FF").execute();
         } catch (KarotzException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
         }
@@ -136,8 +121,8 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     public void onSuccess(AbstractBuild<?, ?> build) {
         String tts = prepareTTS("The project ${projectName} is ok", build);
         try {
-            client.light("0000FF");
-            client.speak(tts, "EN");
+            new SpeakAction(tts, "EN").execute();
+            new LedLightAction("0000FF").execute();
         } catch (KarotzException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
         }

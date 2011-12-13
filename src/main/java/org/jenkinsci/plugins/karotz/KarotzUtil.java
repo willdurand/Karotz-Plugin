@@ -23,33 +23,18 @@
  */
 package org.jenkinsci.plugins.karotz;
 
-import hudson.ProxyConfiguration;
 import hudson.Util;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Utilitiy methods for Karotz.
@@ -118,65 +103,6 @@ public final class KarotzUtil {
         }
 
         return buffer.toString();
-    }
-
-    /**
-     * Sends cmd to Karotz using ReST.
-     *
-     * @param url Karotz webAPI URL
-     * @return response
-     * @throws KarotzException Network or karotz trouble.
-     */
-    public static String doRequest(String url) throws KarotzException {
-        if (url == null) {
-            throw new KarotzException("url is null");
-        }
-
-        String result;
-        try {
-            URLConnection connection = ProxyConfiguration.open(new URL(url));
-            connection.connect();
-            InputStream inputStream = connection.getInputStream();
-            result = IOUtils.toString(inputStream);
-            LOGGER.log(Level.INFO, "result is {0}", result);
-        } catch (IOException e) {
-            throw new KarotzException(e);
-        }
-
-        return result;
-    }
-
-    /**
-     * Parses response from karotz.
-     *
-     * @param response response from karotz
-     * @param tagName
-     * @return tag value
-     * @throws KarotzException illega response
-     */
-    public static String parseResponse(String response, String tagName) throws KarotzException {
-        if (response == null || tagName == null) {
-            throw new IllegalArgumentException("params should not be null.");
-        }
-
-        String value;
-        try {
-            DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document document = parser.parse(new InputSource(new StringReader(response)));
-            Element elt = (Element) document.getElementsByTagName(tagName).item(0);
-            if (elt == null) {
-                return null;
-            }
-            value = elt.getTextContent();
-        } catch (SAXException e) {
-            throw new KarotzException(e);
-        } catch (ParserConfigurationException e) {
-            throw new KarotzException(e);
-        } catch (IOException e) {
-            throw new KarotzException(e);
-        }
-
-        return value;
     }
 
     private static final Logger LOGGER = Logger.getLogger(KarotzUtil.class.getName());
