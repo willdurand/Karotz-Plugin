@@ -74,11 +74,10 @@ public class KarotzClient {
      *
      * @param textToSpeak
      * @param language
-     * @return
      */
-    public boolean speak(String textToSpeak, String language) throws KarotzException {
+    public void speak(String textToSpeak, String language) throws KarotzException {
         if (!isInteractive()) {
-            return false;
+            return;
         }
 
         Map<String, String> params = new HashMap<String, String>();
@@ -89,13 +88,15 @@ public class KarotzClient {
         String url = KAROTZ_URL_TTS + '?' + KarotzUtil.buildQuery(params);
 
         String result = KarotzUtil.doRequest(url);
-
-        return true;
+        String code = KarotzUtil.parseResponse(result, "code");
+        if ("OK".equalsIgnoreCase(code)) {
+            throw new KarotzException("failed to speak code: " + code);
+        }
     }
 
-    public boolean pulse(String color, int period, int pulse) throws KarotzException {
+    public void pulse(String color, int period, int pulse) throws KarotzException {
         if (!isInteractive()) {
-            return false;
+            return;
         }
 
         Map<String, String> params = new HashMap<String, String>();
@@ -107,13 +108,15 @@ public class KarotzClient {
         String url = KAROTZ_URL_LED + '?' + KarotzUtil.buildQuery(params);
 
         String result = KarotzUtil.doRequest(url);
-
-        return true;
+        String code = KarotzUtil.parseResponse(result, "code");
+        if ("OK".equalsIgnoreCase(code)) {
+            throw new KarotzException("failed to speak code: " + code);
+        }
     }
 
-    public boolean light(String color) throws KarotzException {
+    public void light(String color) throws KarotzException {
         if (!isInteractive()) {
-            return false;
+            return;
         }
 
         Map<String, String> params = new HashMap<String, String>();
@@ -123,8 +126,10 @@ public class KarotzClient {
         String url = KAROTZ_URL_LED + '?' + KarotzUtil.buildQuery(params);
 
         String result = KarotzUtil.doRequest(url);
-
-        return true;
+        String code = KarotzUtil.parseResponse(result, "code");
+        if ("OK".equalsIgnoreCase(code)) {
+            throw new KarotzException("failed to speak code: " + code);
+        }
     }
 
     public synchronized void startInteractiveMode() throws KarotzException {

@@ -1,3 +1,26 @@
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2011, Seiji Sogabe
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.jenkinsci.plugins.karotz;
 
 import hudson.ProxyConfiguration;
@@ -30,7 +53,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Utilitiy methods for Karotz.
- * 
+ *
  * @author Seiji Sogabe
  */
 public final class KarotzUtil {
@@ -43,12 +66,12 @@ public final class KarotzUtil {
     }
 
     /**
-     * Creates HmacSha1. 
-     * 
+     * Creates HmacSha1.
+     *
      * @param secretKey SecretKey
      * @param data target data
      * @return HmacSha1
-     * @throws KarotzException Illegal encoding. 
+     * @throws KarotzException Illegal encoding.
      */
     public static String doHmacSha1(String secretKey, String data) throws KarotzException {
         String hmacSha1;
@@ -73,7 +96,7 @@ public final class KarotzUtil {
 
     /**
      * Builds query string.
-     * 
+     *
      * @param params key and value pairs.
      * @return  query string.
      */
@@ -99,10 +122,10 @@ public final class KarotzUtil {
 
     /**
      * Sends cmd to Karotz using ReST.
-     * 
+     *
      * @param url Karotz webAPI URL
      * @return response
-     * @throws KarotzException Network or karotz trouble.  
+     * @throws KarotzException Network or karotz trouble.
      */
     public static String doRequest(String url) throws KarotzException {
         if (url == null) {
@@ -125,9 +148,9 @@ public final class KarotzUtil {
 
     /**
      * Parses response from karotz.
-     * 
+     *
      * @param response response from karotz
-     * @param tagName 
+     * @param tagName
      * @return tag value
      * @throws KarotzException illega response
      */
