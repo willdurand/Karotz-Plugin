@@ -27,6 +27,11 @@ public class KarotzClient {
     private static final String KAROTZ_URL_TTS = "http://api.karotz.com/api/karotz/tts";
 
     /**
+     * Base URL for the LED function
+     */
+    private static final String KAROTZ_URL_LED = "http://api.karotz.com/api/karotz/led";
+
+    /**
      * Logger
      */
     private static final Logger LOGGER = Logger.getLogger(KarotzClient.class.getName());
@@ -65,6 +70,8 @@ public class KarotzClient {
     }
 
     /**
+     * Speak API.
+     *
      * @param textToSpeak
      * @param language
      * @return
@@ -80,6 +87,40 @@ public class KarotzClient {
         params.put("text", textToSpeak);
         params.put("interactiveid", interactiveId);
         String url = KAROTZ_URL_TTS + '?' + KarotzUtil.buildQuery(params);
+
+        String result = KarotzUtil.doRequest(url);
+
+        return true;
+    }
+
+    public boolean pulse(String color, int period, int pulse) throws KarotzException {
+        if (!isInteractive()) {
+            return false;
+        }
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("action", "pulse");
+        params.put("color", color);
+        params.put("period", String.valueOf(period));
+        params.put("pulse", String.valueOf(pulse));
+        params.put("interactiveid", interactiveId);
+        String url = KAROTZ_URL_LED + '?' + KarotzUtil.buildQuery(params);
+
+        String result = KarotzUtil.doRequest(url);
+
+        return true;
+    }
+
+    public boolean light(String color) throws KarotzException {
+        if (!isInteractive()) {
+            return false;
+        }
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("action", "light");
+        params.put("color", color);
+        params.put("interactiveid", interactiveId);
+        String url = KAROTZ_URL_LED + '?' + KarotzUtil.buildQuery(params);
 
         String result = KarotzUtil.doRequest(url);
 
@@ -134,4 +175,4 @@ public class KarotzClient {
         LOGGER.log(Level.INFO, "singedQuery: [{0}]", signedQuery);
         return String.format("%s?%s&signature=%s", KAROTZ_URL_START, q, Util.rawEncode(signedQuery));
     }
-} 
+}

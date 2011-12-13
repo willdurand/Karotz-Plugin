@@ -29,6 +29,10 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class KarotzPublisher extends Notifier {
 
+    private KarotzClient client;
+
+    private KarotzHandler handler;
+
     /**
      * Logger
      */
@@ -36,55 +40,46 @@ public class KarotzPublisher extends Notifier {
 
     @DataBoundConstructor
     public KarotzPublisher() {
+        KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
+        client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
+        handler = new KarotzBuildActionHandler(client);
     }
 
     @Override
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
-        KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
-        KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
         try {
             client.startInteractiveMode();
         } catch (KarotzException ex) {
             return true;
         }
-
-        KarotzBuildListener karotzListener = new KarotzBuildListener(build, client);
-        karotzListener.onStart();
-
+        handler.onStart(build);
         return true;
     }
 
     @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
-
-        KarotzPublisherDescriptor d = Jenkins.getInstance().getDescriptorByType(KarotzPublisherDescriptor.class);
-        KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
         try {
             client.startInteractiveMode();
         } catch (KarotzException ex) {
             return true;
         }
-
-        KarotzBuildListener karotzListener = new KarotzBuildListener(build, client);
-        fire(karotzListener, build);
-
+        fire(handler, build);
         return true;
     }
 
-    private void fire(KarotzBuildListener listener, AbstractBuild<?, ?> build) {
+    private void fire(KarotzHandler listener, AbstractBuild<?, ?> build) {
         String projectName = build.getProject().getName();
 
         if (build.getResult() == Result.FAILURE) {
-            listener.onFailure();
+            listener.onFailure(build);
         } else if (build.getResult() == Result.UNSTABLE) {
-            listener.onUnstable();
+            listener.onUnstable(build);
         } else if (build.getResult() == Result.SUCCESS) {
-            // Build recover
             if (build.getPreviousBuild() != null && build.getPreviousBuild().getResult() == Result.FAILURE) {
-                listener.onRecover();
+                listener.onRecover(build);
             } else {
-                listener.onSuccess();
+                listener.onSuccess(build);
             }
         }
     }
