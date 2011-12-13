@@ -24,35 +24,42 @@
 package org.jenkinsci.plugins.karotz;
 
 /**
- * Karotz Exception
+ * Karotz Exception.
  *
  * @author Seiji Sogabe
  */
 public class KarotzException extends Exception {
 
     /**
-     * {@inheritDoc}
+     * Constructor.
+     *
+     * @param cause the cause
      */
     public KarotzException(Throwable cause) {
         super(cause);
     }
 
     /**
-     * {@inheritDoc}
+     * Constructor.
+     *
+     * @param message the detail message
+     * @param cause the cause
      */
     public KarotzException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * {@inheritDoc}
+     * Constructor.
+     *
+     * @param message the detail message
      */
     public KarotzException(String message) {
         super(message);
     }
 
     /**
-     * {@inheritDoc}
+     * Constructor.
      */
     public KarotzException() {
     }
