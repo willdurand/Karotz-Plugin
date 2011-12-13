@@ -38,11 +38,11 @@
 
   <module name="NewlineAtEndOfFile"/>
 
-  <module name="Header">
+<!--  <module name="Header">
     <property name="headerFile" value="${checkstyle.header.file}"/>
     <property name="fileExtensions" value="java"/>
     <property name="id" value="header"/>
-  </module>
+  </module>-->
 
 <!--  <module name="RegexpSingleline">
     <property name="format" value="\s+$"/>
