@@ -69,8 +69,6 @@ public class KarotzPublisher extends Notifier {
     }
 
     private void fire(KarotzHandler listener, AbstractBuild<?, ?> build) {
-        String projectName = build.getProject().getName();
-
         if (build.getResult() == Result.FAILURE) {
             listener.onFailure(build);
         } else if (build.getResult() == Result.UNSTABLE) {
