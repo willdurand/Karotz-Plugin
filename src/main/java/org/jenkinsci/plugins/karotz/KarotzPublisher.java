@@ -49,7 +49,7 @@ public class KarotzPublisher extends Notifier {
         } catch (KarotzException ex) {
             return true;
         }
-        
+
         return true;
     }
 
@@ -63,6 +63,7 @@ public class KarotzPublisher extends Notifier {
             KarotzHandler handler = new KarotzBuildActionHandler();
             fire(handler, build);
         } catch (KarotzException ex) {
+            listener.getLogger().println(ex);
             return true;
         }
 

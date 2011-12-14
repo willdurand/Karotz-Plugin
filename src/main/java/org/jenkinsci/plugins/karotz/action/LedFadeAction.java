@@ -23,45 +23,42 @@
  */
 package org.jenkinsci.plugins.karotz.action;
 
+import java.util.HashMap;
 import java.util.Map;
-import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.karotz.KarotzClient;
-import org.jenkinsci.plugins.karotz.KarotzException;
-import org.jenkinsci.plugins.karotz.KarotzPublisher;
-import org.jenkinsci.plugins.karotz.KarotzUtil;
 
 /**
- * karotz Action
+ * Led Light Action.
  *
  * @author Seiji Sogabe
  */
-public abstract class KarotzAction {
+public class LedFadeAction extends KarotzAction {
 
-    public abstract String getBaseUrl();
+    public static String RED = "FF0000";
 
-    public abstract Map<String, String> getParameters();
+    public static String BLUE = "0000FF";
 
-    public void execute() throws KarotzException {
-        KarotzClient client = getClient();
+    public static String YELLOW = "FFFF00";
 
-        if (!client.isInteractive()) {
-            return;
-        }
+    public static String GREEN = "00FF00";
 
-        Map<String, String> params = getParameters();
-        params.put("interactiveid", client.getInteractiveId());
-        String url = getBaseUrl() + '?' + KarotzUtil.buildQuery(params);
+    private String color;
 
-        String result = client.doRequest(url);
-        String code = client.parseResponse(result, "code");
-        if (!"OK".equalsIgnoreCase(code)) {
-            throw new KarotzException("failed to do action: " + code);
-        }
+    private long period;
+
+    public LedFadeAction(String color, long period) {
+        this.color = color;
+        this.period = period;
     }
 
-    protected KarotzClient getClient() {
-        KarotzPublisher.KarotzPublisherDescriptor d
-                = Jenkins.getInstance().getDescriptorByType(KarotzPublisher.KarotzPublisherDescriptor.class);
-        return new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
+    public String getBaseUrl() {
+        return "http://api.karotz.com/api/karotz/led";
+    }
+
+    public Map<String, String> getParameters() {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("action", "fade");
+        params.put("color", color);
+        params.put("period", String.valueOf(period));
+        return params;
     }
 }

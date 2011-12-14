@@ -31,21 +31,7 @@ import java.util.Map;
  *
  * @author Seiji Sogabe
  */
-public class LedLightAction extends KarotzAction {
-
-    public static String RED = "FF0000";
-
-    public static String BLUE = "0000FF";
-
-    public static String YELLOW = "FFFF00";
-
-    public static String GREEN = "00FF00";
-
-    private String color;
-
-    public LedLightAction(String color) {
-        this.color = color;
-    }
+public class LedOffAction extends KarotzAction {
 
     public String getBaseUrl() {
         return "http://api.karotz.com/api/karotz/led";
@@ -54,9 +40,6 @@ public class LedLightAction extends KarotzAction {
     public Map<String, String> getParameters() {
         Map<String, String> params = new HashMap<String, String>();
         params.put("action", "light");
-        if (color != null) {
-            params.put("color", color);
-        }
         return params;
     }
 }

@@ -37,6 +37,10 @@ public class SpeakAction extends KarotzAction {
 
     private String language;
 
+    public SpeakAction(String textToSpeak) {
+        this(textToSpeak, "EN");
+    }
+
     public SpeakAction(String textToSpeak, String language) {
         this.textToSpeak = textToSpeak;
         this.language = language;
