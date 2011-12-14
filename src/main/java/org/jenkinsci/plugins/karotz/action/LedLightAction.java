@@ -33,13 +33,13 @@ import java.util.Map;
  */
 public class LedLightAction extends KarotzAction {
 
-    public static String RED = "FF0000";
+    public static final String RED = "FF0000";
 
-    public static String BLUE = "0000FF";
+    public static final String BLUE = "0000FF";
 
-    public static String YELLOW = "FFFF00";
+    public static final String YELLOW = "FFFF00";
 
-    public static String GREEN = "00FF00";
+    public static final String GREEN = "00FF00";
 
     private String color;
 

@@ -105,5 +105,4 @@ public final class KarotzUtil {
         return buffer.toString();
     }
 
-    private static final Logger LOGGER = Logger.getLogger(KarotzUtil.class.getName());
 }
