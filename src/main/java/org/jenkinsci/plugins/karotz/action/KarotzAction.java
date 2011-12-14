@@ -59,7 +59,7 @@ public abstract class KarotzAction {
         }
     }
 
-    private KarotzClient getClient() {
+    protected KarotzClient getClient() {
         KarotzPublisher.KarotzPublisherDescriptor d
                 = Jenkins.getInstance().getDescriptorByType(KarotzPublisher.KarotzPublisherDescriptor.class);
         return new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
