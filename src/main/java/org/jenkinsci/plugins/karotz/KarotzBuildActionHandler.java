@@ -57,7 +57,7 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     @Override
     public void onStart(AbstractBuild<?, ?> build) throws KarotzException {
         String tts = prepareTTS("The project ${projectName} has started", build);
-        new LedFadeAction(LedFadeAction.BLUE, 3000).execute();
+        new LedFadeAction(LedFadeAction.GREEN, 3000).execute();
         new SpeakAction(tts).execute();
     }
 
@@ -69,7 +69,7 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     @Override
     public void onFailure(AbstractBuild<?, ?> build) throws KarotzException {
         String tts = prepareTTS("The project ${projectName} has failed", build);
-        for (int i = 3; i > 0; i--) {
+        for (int i = 5; i > 0; i--) {
             new LedOffAction().execute();
             new LedLightAction(LedLightAction.RED).execute();
         }
@@ -96,7 +96,7 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     @Override
     public void onRecover(AbstractBuild<?, ?> build) throws KarotzException {
         String tts = prepareTTS("The project ${projectName} is back to stable", build);
-        new LedLightAction(LedLightAction.GREEN).execute();
+        new LedLightAction(LedLightAction.BLUE).execute();
         new SpeakAction(tts).execute();
     }
 
@@ -108,9 +108,9 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     @Override
     public void onSuccess(AbstractBuild<?, ?> build) throws KarotzException {
         String tts = prepareTTS("The project ${projectName} is ok", build);
-        for (int i = 3; i > 0; i--) {
+        for (int i = 5; i > 0; i--) {
             new LedOffAction().execute();
-            new LedLightAction(LedLightAction.GREEN).execute();
+            new LedLightAction(LedLightAction.BLUE).execute();
         }
         new SpeakAction(tts).execute();
     }
