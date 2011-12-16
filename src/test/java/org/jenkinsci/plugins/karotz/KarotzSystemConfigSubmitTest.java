@@ -24,6 +24,7 @@
 package org.jenkinsci.plugins.karotz;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import jenkins.model.Jenkins;
 import org.jvnet.hudson.test.HudsonTestCase;
 
@@ -34,12 +35,20 @@ import org.jvnet.hudson.test.HudsonTestCase;
  */
 public class KarotzSystemConfigSubmitTest extends HudsonTestCase {
 
+    private static final String NAME_API_KEY = "_.apiKey";
+
+    private static final String NAME_SECRET_KEY = "_.secretKey";
+
+    private static final String NAME_INSTALL_ID = "_.installId";
+
     private WebClient webClient;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         webClient = new WebClient();
+        webClient.setCssEnabled(false);
+        webClient.setThrowExceptionOnFailingStatusCode(false);
     }
 
     @Override
@@ -53,9 +62,9 @@ public class KarotzSystemConfigSubmitTest extends HudsonTestCase {
         String installId = "187da8ca-7b19-6422-afe1-d609129b088f";
 
         HtmlForm form = webClient.goTo("configure").getFormByName("config");
-        form.getInputByName("_.apiKey").setValueAttribute(apiKey);
-        form.getInputByName("_.secretKey").setValueAttribute(secretKey);
-        form.getInputByName("_.installId").setValueAttribute(installId);
+        form.getInputByName(NAME_API_KEY).setValueAttribute(apiKey);
+        form.getInputByName(NAME_SECRET_KEY).setValueAttribute(secretKey);
+        form.getInputByName(NAME_INSTALL_ID).setValueAttribute(installId);
 
         submit(form);
 
@@ -71,4 +80,47 @@ public class KarotzSystemConfigSubmitTest extends HudsonTestCase {
         assertEquals(secretKey, form.getInputByName("_.secretKey").getValueAttribute());
         assertEquals(installId, form.getInputByName("_.installId").getValueAttribute());
     }
+
+    public void testConfigSubmit_APIKeyIsNull() throws Exception {
+        String apiKey = null;
+        String secretKey = "187da8ba-7b19-4422-afed-d609d29b004f";
+        String installId = "187da8ca-7b19-6422-afe1-d609129b088f";
+
+        HtmlForm form = webClient.goTo("configure").getFormByName("config");
+        form.getInputByName(NAME_API_KEY).setTextContent(apiKey);
+        form.getInputByName(NAME_SECRET_KEY).setValueAttribute(secretKey);
+        form.getInputByName(NAME_INSTALL_ID).setValueAttribute(installId);
+
+        HtmlPage page = submit(form);
+        assertStringContains(page.asText(), "API Key, Secret Key and Install ID are mandatory.");
+    }
+
+    public void testConfigSubmit_SecretKeyIsNull() throws Exception {
+        String apiKey = "187da8ba-7b19-4422-afed-d609d29b004f";
+        String secretKey = null;
+        String installId = "187da8ca-7b19-6422-afe1-d609129b088f";
+
+        HtmlForm form = webClient.goTo("configure").getFormByName("config");
+        form.getInputByName(NAME_API_KEY).setTextContent(apiKey);
+        form.getInputByName(NAME_SECRET_KEY).setValueAttribute(secretKey);
+        form.getInputByName(NAME_INSTALL_ID).setValueAttribute(installId);
+
+        HtmlPage page = submit(form);
+        assertStringContains(page.asText(), "API Key, Secret Key and Install ID are mandatory.");
+    }
+
+    public void testConfigSubmit_InstallIDIsNull() throws Exception {
+        String apiKey = "187da8ba-7b19-4422-afed-d609d29b004f";
+        String secretKey = "187da8ca-7b19-6422-afe1-d609129b088f";
+        String installId = null;
+
+        HtmlForm form = webClient.goTo("configure").getFormByName("config");
+        form.getInputByName(NAME_API_KEY).setTextContent(apiKey);
+        form.getInputByName(NAME_SECRET_KEY).setValueAttribute(secretKey);
+        form.getInputByName(NAME_INSTALL_ID).setValueAttribute(installId);
+
+        HtmlPage page = submit(form);
+        assertStringContains(page.asText(), "API Key, Secret Key and Install ID are mandatory.");
+    }
+
 }
