@@ -123,6 +123,9 @@ public class KarotzPublisher extends Notifier {
             apiKey = Util.fixEmptyAndTrim(json.getString("apiKey"));
             secretKey = Util.fixEmptyAndTrim(json.getString("secretKey"));
             installId = Util.fixEmptyAndTrim(json.getString("installId"));
+            if (apiKey == null || secretKey == null || installId == null) {
+                throw new FormException("API Key, Secret Key and Install ID are mandatory.", apiKey);
+            }
             save();
             return true;
         }
