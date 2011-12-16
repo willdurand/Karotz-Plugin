@@ -24,6 +24,7 @@
 package org.jenkinsci.plugins.karotz;
 
 import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
 
 /**
  * karotz Handler.
@@ -36,35 +37,40 @@ public interface KarotzHandler {
      * Triggered on build start.
      *
      * @param build The build in progress
+     * @param listener build listener
      */
-    void onStart(AbstractBuild<?, ?> build) throws KarotzException;
+    void onStart(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
     /**
      * Triggered on build failure.
      *
      * @param build The build in progress
+     * @param listener build listener
      */
-    void onFailure(AbstractBuild<?, ?> build) throws KarotzException;
+    void onFailure(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
     /**
      * Triggered on build recover.
      *
      * @param build The build in progress
+     * @param listener build listener
      */
-    void onRecover(AbstractBuild<?, ?> build) throws KarotzException;
+    void onRecover(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
     /**
      * Triggered on build success.
      *
      * @param build The build in progress
+     * @param listener build listener
      */
-    void onSuccess(AbstractBuild<?, ?> build) throws KarotzException;
+    void onSuccess(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
     /**
      * Triggered on build unstable.
      *
      * @param build The build in progress
+     * @param listener build listener
      */
-    void onUnstable(AbstractBuild<?, ?> build) throws KarotzException;
+    void onUnstable(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
 }

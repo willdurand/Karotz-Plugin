@@ -45,7 +45,7 @@ public class KarotzPublisher extends Notifier {
         try {
             client.startInteractiveMode();
             KarotzHandler handler = new KarotzBuildActionHandler();
-            handler.onStart(build);
+            handler.onStart(build, listener);
         } catch (KarotzException ex) {
             return true;
         }
@@ -61,7 +61,7 @@ public class KarotzPublisher extends Notifier {
         try {
             client.startInteractiveMode();
             KarotzHandler handler = new KarotzBuildActionHandler();
-            fire(handler, build);
+            fire(handler, build, listener);
         } catch (KarotzException ex) {
             listener.getLogger().println(ex);
             return true;
@@ -70,16 +70,16 @@ public class KarotzPublisher extends Notifier {
         return true;
     }
 
-    private void fire(KarotzHandler listener, AbstractBuild<?, ?> build) throws KarotzException {
+    private void fire(KarotzHandler handler, AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
         if (build.getResult() == Result.FAILURE) {
-            listener.onFailure(build);
+            handler.onFailure(build, listener);
         } else if (build.getResult() == Result.UNSTABLE) {
-            listener.onUnstable(build);
+            handler.onUnstable(build, listener);
         } else if (build.getResult() == Result.SUCCESS) {
             if (build.getPreviousBuild() != null && build.getPreviousBuild().getResult() == Result.FAILURE) {
-                listener.onRecover(build);
+                handler.onRecover(build, listener);
             } else {
-                listener.onSuccess(build);
+                handler.onSuccess(build, listener);
             }
         }
     }

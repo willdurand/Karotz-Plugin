@@ -23,8 +23,16 @@
  */
 package org.jenkinsci.plugins.karotz.action;
 
+import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jenkinsci.plugins.karotz.KarotzException;
+import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
+import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 
 /**
  * SpeakAction.
@@ -57,4 +65,23 @@ public class SpeakAction extends KarotzAction {
         params.put("text", textToSpeak);
         return params;
     }
+
+    @Override
+    public void execute(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
+        try {
+            textToSpeak = TokenMacro.expandAll(build, listener, textToSpeak);
+        } catch (MacroEvaluationException ex) {
+            LOGGER.log(Level.WARNING, "Build variables seem to be invalid", ex);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "IO Error", ex);
+        } catch (InterruptedException ex) {
+            LOGGER.log(Level.WARNING, "Interrupted", ex);
+        }
+        super.execute(build, listener);
+    }
+
+    /**
+     * Logger
+     */
+    protected static final Logger LOGGER = Logger.getLogger(SpeakAction.class.getName());
 }

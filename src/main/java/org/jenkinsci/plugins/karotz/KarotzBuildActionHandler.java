@@ -24,7 +24,7 @@
 package org.jenkinsci.plugins.karotz;
 
 import hudson.model.AbstractBuild;
-import org.apache.commons.lang.StringUtils;
+import hudson.model.BuildListener;
 import org.jenkinsci.plugins.karotz.action.LedFadeAction;
 import org.jenkinsci.plugins.karotz.action.LedLightAction;
 import org.jenkinsci.plugins.karotz.action.LedOffAction;
@@ -38,81 +38,74 @@ import org.jenkinsci.plugins.karotz.action.SpeakAction;
 public class KarotzBuildActionHandler implements KarotzHandler {
 
     /**
-     * Prepare the text to speak (tts) by replacing variables with their values.
-     *
-     * @param textToSpeak text to speak
-     * @param build The build in progress
-     * @return the text to speak by replaced vliables
-     */
-    private String prepareTTS(String textToSpeak, AbstractBuild<?, ?> build) {
-        String projectName = build.getProject().getName();
-        return StringUtils.replace(textToSpeak, "${projectName}", projectName);
-    }
-
-    /**
      * Triggered on build start.
      *
      * @param build The build in progress
+     * @param listener build listener
      */
     @Override
-    public void onStart(AbstractBuild<?, ?> build) throws KarotzException {
-        String tts = prepareTTS("The project ${projectName} has started", build);
-        new LedFadeAction(LedFadeAction.GREEN, 3000).execute();
-        new SpeakAction(tts).execute();
+    public void onStart(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
+        String tts = "The build ${BUILD_NUMBER} of project ${JOB_NAME} has started";
+        new LedFadeAction(LedFadeAction.GREEN, 3000).execute(build, listener);
+        new SpeakAction(tts).execute(build, listener);
     }
 
     /**
      * Triggered on build failure.
      *
      * @param build The build in progress
+     * @param listener build listener
      */
     @Override
-    public void onFailure(AbstractBuild<?, ?> build) throws KarotzException {
-        String tts = prepareTTS("The project ${projectName} has failed", build);
+    public void onFailure(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
+        String tts = "Failure of build ${BUILD_NUMBER} in project ${JOB_NAME}";
         for (int i = 5; i > 0; i--) {
-            new LedOffAction().execute();
-            new LedLightAction(LedLightAction.RED).execute();
+            new LedOffAction().execute(build, listener);
+            new LedLightAction(LedLightAction.RED).execute(build, listener);
         }
-        new SpeakAction(tts).execute();
+        new SpeakAction(tts).execute(build, listener);
     }
 
     /**
      * Triggered on build unstable.
      *
      * @param build The build in progress
+     * @param listener build listener
      */
     @Override
-    public void onUnstable(AbstractBuild<?, ?> build) throws KarotzException {
-        String tts = prepareTTS("The project ${projectName} is unstable", build);
-        new LedLightAction(LedLightAction.YELLOW).execute();
-        new SpeakAction(tts).execute();
+    public void onUnstable(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
+        String tts = "Project ${JOB_NAME} is unstable at build ${BUILD_NUMBER}";
+        new LedLightAction(LedLightAction.YELLOW).execute(build, listener);
+        new SpeakAction(tts).execute(build, listener);
     }
 
     /**
      * Triggered on build recover.
      *
      * @param build The build in progress
+     * @param listener build listener
      */
     @Override
-    public void onRecover(AbstractBuild<?, ?> build) throws KarotzException {
-        String tts = prepareTTS("The project ${projectName} is back to stable", build);
-        new LedLightAction(LedLightAction.BLUE).execute();
-        new SpeakAction(tts).execute();
+    public void onRecover(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
+        String tts = "Project ${JOB_NAME} recovered at build ${BUILD_NUMBER}";
+        new LedLightAction(LedLightAction.BLUE).execute(build, listener);
+        new SpeakAction(tts).execute(build, listener);
     }
 
     /**
      * Triggered on build success.
      *
      * @param build The build in progress
+     * @param listener build listener
      */
     @Override
-    public void onSuccess(AbstractBuild<?, ?> build) throws KarotzException {
-        String tts = prepareTTS("The project ${projectName} is ok", build);
+    public void onSuccess(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
+        String tts = "Success of build ${BUILD_NUMBER} in project ${JOB_NAMe}";
         for (int i = 5; i > 0; i--) {
-            new LedOffAction().execute();
-            new LedLightAction(LedLightAction.BLUE).execute();
+            new LedOffAction().execute(build, listener);
+            new LedLightAction(LedLightAction.BLUE).execute(build, listener);
         }
-        new SpeakAction(tts).execute();
+        new SpeakAction(tts).execute(build, listener);
     }
 
 }

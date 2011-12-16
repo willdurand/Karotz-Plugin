@@ -23,6 +23,8 @@
  */
 package org.jenkinsci.plugins.karotz.action;
 
+import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
 import java.util.Map;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.karotz.KarotzClient;
@@ -41,9 +43,12 @@ public abstract class KarotzAction {
 
     public abstract Map<String, String> getParameters();
 
-    public void execute() throws KarotzException {
-        KarotzClient client = getClient();
+    public void execute(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
+        if (build == null || listener == null) {
+            throw new KarotzException("build and listener should be not null");
+        }
 
+        KarotzClient client = getClient();
         if (!client.isInteractive()) {
             return;
         }
