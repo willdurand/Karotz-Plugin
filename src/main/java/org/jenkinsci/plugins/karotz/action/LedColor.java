@@ -23,36 +23,35 @@
  */
 package org.jenkinsci.plugins.karotz.action;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Led Light Action.
+ * Color of Led.
  *
  * @author Seiji Sogabe
  */
-public class LedLightAction extends KarotzAction {
+public enum LedColor {
 
-    private String color;
+    RED("FF0000"),
+    GREEN("00FF00"),
+    BLUE("0000FF"),
+    YELLOW("FFFF00");
 
-    public LedLightAction(String color) {
-        this.color = color;
+    private String code;
+
+    /**
+     * Constructor.
+     *
+     * @param code RGB color string like "00FF00"
+     */
+    private LedColor(String code) {
+        this.code = code;
     }
 
-    public LedLightAction(LedColor color) {
-        this(color.getCode());
-    }
-
-    public String getBaseUrl() {
-        return "http://api.karotz.com/api/karotz/led";
-    }
-
-    public Map<String, String> getParameters() {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("action", "light");
-        if (color != null) {
-            params.put("color", color);
-        }
-        return params;
+    /**
+     * Gets color code.
+     *
+     * @return color code
+     */
+    public String getCode() {
+        return code;
     }
 }

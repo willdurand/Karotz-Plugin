@@ -25,6 +25,7 @@ package org.jenkinsci.plugins.karotz;
 
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
+import org.jenkinsci.plugins.karotz.action.LedColor;
 import org.jenkinsci.plugins.karotz.action.LedFadeAction;
 import org.jenkinsci.plugins.karotz.action.LedLightAction;
 import org.jenkinsci.plugins.karotz.action.LedOffAction;
@@ -46,7 +47,7 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     @Override
     public void onStart(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
         String tts = "The build ${BUILD_NUMBER} of project ${JOB_NAME} has started";
-        new LedFadeAction(LedFadeAction.GREEN, 3000).execute(build, listener);
+        new LedFadeAction(LedColor.GREEN, 3000).execute(build, listener);
         new SpeakAction(tts).execute(build, listener);
     }
 
@@ -61,7 +62,7 @@ public class KarotzBuildActionHandler implements KarotzHandler {
         String tts = "Failure of build ${BUILD_NUMBER} in project ${JOB_NAME}";
         for (int i = 5; i > 0; i--) {
             new LedOffAction().execute(build, listener);
-            new LedLightAction(LedLightAction.RED).execute(build, listener);
+            new LedLightAction(LedColor.RED).execute(build, listener);
         }
         new SpeakAction(tts).execute(build, listener);
     }
@@ -75,7 +76,7 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     @Override
     public void onUnstable(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
         String tts = "Project ${JOB_NAME} is unstable at build ${BUILD_NUMBER}";
-        new LedLightAction(LedLightAction.YELLOW).execute(build, listener);
+        new LedLightAction(LedColor.YELLOW).execute(build, listener);
         new SpeakAction(tts).execute(build, listener);
     }
 
@@ -88,7 +89,7 @@ public class KarotzBuildActionHandler implements KarotzHandler {
     @Override
     public void onRecover(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
         String tts = "Project ${JOB_NAME} recovered at build ${BUILD_NUMBER}";
-        new LedLightAction(LedLightAction.BLUE).execute(build, listener);
+        new LedLightAction(LedColor.BLUE).execute(build, listener);
         new SpeakAction(tts).execute(build, listener);
     }
 
@@ -103,7 +104,7 @@ public class KarotzBuildActionHandler implements KarotzHandler {
         String tts = "Success of build ${BUILD_NUMBER} in project ${JOB_NAMe}";
         for (int i = 5; i > 0; i--) {
             new LedOffAction().execute(build, listener);
-            new LedLightAction(LedLightAction.BLUE).execute(build, listener);
+            new LedLightAction(LedColor.BLUE).execute(build, listener);
         }
         new SpeakAction(tts).execute(build, listener);
     }

@@ -33,14 +33,6 @@ import java.util.Map;
  */
 public class LedFadeAction extends KarotzAction {
 
-    public static final String RED = "FF0000";
-
-    public static final String BLUE = "0000FF";
-
-    public static final String YELLOW = "FFFF00";
-
-    public static final String GREEN = "00FF00";
-
     private String color;
 
     private long period;
@@ -48,6 +40,10 @@ public class LedFadeAction extends KarotzAction {
     public LedFadeAction(String color, long period) {
         this.color = color;
         this.period = period;
+    }
+
+    public LedFadeAction(LedColor color, long period) {
+        this(color.getCode(), period);
     }
 
     public String getBaseUrl() {
