@@ -101,8 +101,8 @@ public class KarotzSystemConfigSubmitTest extends HudsonTestCase {
         String installId = "187da8ca-7b19-6422-afe1-d609129b088f";
 
         HtmlForm form = webClient.goTo("configure").getFormByName("config");
-        form.getInputByName(NAME_API_KEY).setTextContent(apiKey);
-        form.getInputByName(NAME_SECRET_KEY).setValueAttribute(secretKey);
+        form.getInputByName(NAME_API_KEY).setValueAttribute(apiKey);
+        form.getInputByName(NAME_SECRET_KEY).setTextContent(secretKey);
         form.getInputByName(NAME_INSTALL_ID).setValueAttribute(installId);
 
         HtmlPage page = submit(form);
@@ -115,9 +115,9 @@ public class KarotzSystemConfigSubmitTest extends HudsonTestCase {
         String installId = null;
 
         HtmlForm form = webClient.goTo("configure").getFormByName("config");
-        form.getInputByName(NAME_API_KEY).setTextContent(apiKey);
+        form.getInputByName(NAME_API_KEY).setValueAttribute(apiKey);
         form.getInputByName(NAME_SECRET_KEY).setValueAttribute(secretKey);
-        form.getInputByName(NAME_INSTALL_ID).setValueAttribute(installId);
+        form.getInputByName(NAME_INSTALL_ID).setTextContent(installId);
 
         HtmlPage page = submit(form);
         assertStringContains(page.asText(), "API Key, Secret Key and Install ID are mandatory.");
