@@ -7,14 +7,16 @@
         <f:entry title="${%Secret Key}" field="secretKey">
             <f:textbox />
         </f:entry>
-        <f:entry title="${%InstallID}" field="installId">
+        <f:entry title="${%Install ID}" field="installId">
             <f:textbox />
         </f:entry>
-        <f:validateButton
-            title="${%Start interactive mode}" progress="${%Start interactive mode...}"
-            method="startInteractiveMode" with="apiKey,secretKey,installId" />    
-        <f:validateButton
-            title="${%Stop interactive mode}" progress="${%Stop interactive mode...}"
-            method="stopInteractiveMode" />    
+        <f:advanced>
+            <f:validateButton
+                title="${%Start interactive mode}" progress="${%Start interactive mode...}"
+                method="startInteractiveMode" with="apiKey,secretKey,installId" />
+            <f:validateButton
+                title="${%Stop interactive mode}" progress="${%Stop interactive mode...}"
+                method="stopInteractiveMode" />
+        </f:advanced>
     </f:section>
 </j:jelly>
