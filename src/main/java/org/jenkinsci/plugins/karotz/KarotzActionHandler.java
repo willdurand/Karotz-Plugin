@@ -23,15 +23,18 @@
  */
 package org.jenkinsci.plugins.karotz;
 
+import hudson.ExtensionPoint;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractDescribableImpl;
 import hudson.model.BuildListener;
+import hudson.model.Descriptor;
 
 /**
  * karotz Handler.
  *
  * @author Seiji Sogabe
  */
-public interface KarotzHandler {
+public abstract class KarotzActionHandler extends AbstractDescribableImpl<KarotzActionHandler> implements ExtensionPoint {
 
     /**
      * Triggered on build start.
@@ -39,7 +42,7 @@ public interface KarotzHandler {
      * @param build The build in progress
      * @param listener build listener
      */
-    void onStart(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
+    public abstract void onStart(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
     /**
      * Triggered on build failure.
@@ -47,7 +50,7 @@ public interface KarotzHandler {
      * @param build The build in progress
      * @param listener build listener
      */
-    void onFailure(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
+    public abstract void onFailure(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
     /**
      * Triggered on build recover.
@@ -55,7 +58,7 @@ public interface KarotzHandler {
      * @param build The build in progress
      * @param listener build listener
      */
-    void onRecover(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
+    public abstract void onRecover(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
     /**
      * Triggered on build success.
@@ -63,7 +66,7 @@ public interface KarotzHandler {
      * @param build The build in progress
      * @param listener build listener
      */
-    void onSuccess(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
+    public abstract void onSuccess(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
     /**
      * Triggered on build unstable.
@@ -71,6 +74,10 @@ public interface KarotzHandler {
      * @param build The build in progress
      * @param listener build listener
      */
-    void onUnstable(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
+    public abstract void onUnstable(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
+    @Override
+    public Descriptor<KarotzActionHandler> getDescriptor() {
+        return (KarotzActionHandlerDescriptor) super.getDescriptor();
+    }
 }

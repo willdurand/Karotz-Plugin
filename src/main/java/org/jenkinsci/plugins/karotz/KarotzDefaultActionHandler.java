@@ -23,6 +23,7 @@
  */
 package org.jenkinsci.plugins.karotz;
 
+import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import org.jenkinsci.plugins.karotz.action.LedColor;
@@ -30,13 +31,18 @@ import org.jenkinsci.plugins.karotz.action.LedFadeAction;
 import org.jenkinsci.plugins.karotz.action.LedLightAction;
 import org.jenkinsci.plugins.karotz.action.LedOffAction;
 import org.jenkinsci.plugins.karotz.action.SpeakAction;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
- * KarotzBuildActionHandler.
+ * KarotzDefaultActionHandler.
  *
  * @author Seiji Sogabe
  */
-public class KarotzBuildActionHandler implements KarotzHandler {
+public class KarotzDefaultActionHandler extends KarotzActionHandler {
+
+    @DataBoundConstructor
+    public KarotzDefaultActionHandler() {
+    }
 
     /**
      * Triggered on build start.
@@ -46,8 +52,8 @@ public class KarotzBuildActionHandler implements KarotzHandler {
      */
     @Override
     public void onStart(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
-        String tts = "The build ${BUILD_NUMBER} of project ${JOB_NAME} has started";
         new LedFadeAction(LedColor.GREEN, 3000).execute(build, listener);
+        String tts = "The build ${BUILD_NUMBER} of project ${JOB_NAME} has started";
         new SpeakAction(tts).execute(build, listener);
     }
 
@@ -109,4 +115,12 @@ public class KarotzBuildActionHandler implements KarotzHandler {
         new SpeakAction(tts).execute(build, listener);
     }
 
+    @Extension
+    public static class DescriptorImpl extends KarotzActionHandlerDescriptor {
+
+        @Override
+        public String getDisplayName() {
+            return "Action Handler";
+        }
+    }
 }

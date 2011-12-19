@@ -26,6 +26,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * KarotzPublisher class.
  *
  * @author William Durand <william.durand1@gmail.com>
+ * @author Seiji Sogabe <s.sogabe@gmail.com>
  */
 public class KarotzPublisher extends Notifier {
 
@@ -44,7 +45,7 @@ public class KarotzPublisher extends Notifier {
         KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
         try {
             client.startInteractiveMode();
-            KarotzHandler handler = new KarotzBuildActionHandler();
+            KarotzActionHandler handler = d.getActionHandler();
             handler.onStart(build, listener);
         } catch (KarotzException ex) {
             return true;
@@ -60,7 +61,7 @@ public class KarotzPublisher extends Notifier {
         KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
         try {
             client.startInteractiveMode();
-            KarotzHandler handler = new KarotzBuildActionHandler();
+            KarotzActionHandler handler = d.getActionHandler();
             fire(handler, build, listener);
         } catch (KarotzException ex) {
             listener.getLogger().println(ex);
@@ -70,7 +71,7 @@ public class KarotzPublisher extends Notifier {
         return true;
     }
 
-    private void fire(KarotzHandler handler, AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
+    private void fire(KarotzActionHandler handler, AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
         if (build.getResult() == Result.FAILURE) {
             handler.onFailure(build, listener);
         } else if (build.getResult() == Result.UNSTABLE) {
@@ -102,6 +103,8 @@ public class KarotzPublisher extends Notifier {
 
         private String installId;
 
+        private KarotzActionHandler actionHandler;
+
         public String getApiKey() {
             return apiKey;
         }
@@ -112,6 +115,10 @@ public class KarotzPublisher extends Notifier {
 
         public String getInstallId() {
             return installId;
+        }
+
+        public KarotzActionHandler getActionHandler() {
+            return actionHandler;
         }
 
         public KarotzPublisherDescriptor() {
@@ -126,6 +133,14 @@ public class KarotzPublisher extends Notifier {
             if (apiKey == null || secretKey == null || installId == null) {
                 throw new FormException("API Key, Secret Key and Install ID are mandatory.", apiKey);
             }
+
+            KarotzActionHandler h = req.bindJSON(KarotzActionHandler.class,json.optJSONObject("actionHandler"));
+            if (h == null) {
+                actionHandler = new KarotzDefaultActionHandler();
+            } else {
+                actionHandler = h;
+            }
+
             save();
             return true;
         }
