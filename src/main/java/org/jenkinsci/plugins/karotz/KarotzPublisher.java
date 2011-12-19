@@ -71,7 +71,8 @@ public class KarotzPublisher extends Notifier {
         return true;
     }
 
-    private void fire(KarotzActionHandler handler, AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
+    private void fire(KarotzActionHandler handler, AbstractBuild<?, ?> build, BuildListener listener)
+            throws KarotzException {
         if (build.getResult() == Result.FAILURE) {
             handler.onFailure(build, listener);
         } else if (build.getResult() == Result.UNSTABLE) {
@@ -134,7 +135,7 @@ public class KarotzPublisher extends Notifier {
                 throw new FormException("API Key, Secret Key and Install ID are mandatory.", apiKey);
             }
 
-            KarotzActionHandler h = req.bindJSON(KarotzActionHandler.class,json.optJSONObject("actionHandler"));
+            KarotzActionHandler h = req.bindJSON(KarotzActionHandler.class, json.optJSONObject("actionHandler"));
             if (h == null) {
                 actionHandler = new KarotzDefaultActionHandler();
             } else {

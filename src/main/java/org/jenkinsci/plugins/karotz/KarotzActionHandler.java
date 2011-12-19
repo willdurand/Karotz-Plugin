@@ -34,7 +34,8 @@ import hudson.model.Descriptor;
  *
  * @author Seiji Sogabe
  */
-public abstract class KarotzActionHandler extends AbstractDescribableImpl<KarotzActionHandler> implements ExtensionPoint {
+public abstract class KarotzActionHandler extends AbstractDescribableImpl<KarotzActionHandler>
+        implements ExtensionPoint {
 
     /**
      * Triggered on build start.

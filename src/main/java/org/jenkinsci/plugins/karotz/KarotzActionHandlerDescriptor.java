@@ -23,9 +23,7 @@
  */
 package org.jenkinsci.plugins.karotz;
 
-import hudson.DescriptorExtensionList;
 import hudson.model.Descriptor;
-import jenkins.model.Jenkins;
 
 /**
  * Descriptor for {@link KarotzActionHandler}.
@@ -41,10 +39,4 @@ public abstract class KarotzActionHandlerDescriptor extends Descriptor<KarotzAct
     protected KarotzActionHandlerDescriptor() {
     }
 
-    /**
-     * Returns all the registered {@link KarotzActionHandlerDescriptor}s.
-     */
-    public static DescriptorExtensionList<KarotzActionHandler, KarotzActionHandlerDescriptor> all() {
-        return Jenkins.getInstance().<KarotzActionHandler, KarotzActionHandlerDescriptor>getDescriptorList(KarotzActionHandler.class);
-    }
 }
