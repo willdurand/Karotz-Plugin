@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.karotz;
 
+import org.jenkinsci.plugins.karotz.actionhandler.KarotzActionHandler;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.Util;
@@ -18,6 +19,7 @@ import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+import org.jenkinsci.plugins.karotz.actionhandler.KarotzDefaultActionHandler;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;

@@ -21,11 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jenkinsci.plugins.karotz;
+package org.jenkinsci.plugins.karotz.actionhandler;
 
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
+import org.jenkinsci.plugins.karotz.KarotzException;
 import org.jenkinsci.plugins.karotz.action.LedColor;
 import org.jenkinsci.plugins.karotz.action.LedFadeAction;
 import org.jenkinsci.plugins.karotz.action.LedLightAction;
@@ -120,7 +121,7 @@ public class KarotzDefaultActionHandler extends KarotzActionHandler {
 
         @Override
         public String getDisplayName() {
-            return "Action Handler";
+            return "Default ActionHandler";
         }
     }
 }

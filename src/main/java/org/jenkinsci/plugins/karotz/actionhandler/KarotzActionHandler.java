@@ -21,13 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jenkinsci.plugins.karotz;
+package org.jenkinsci.plugins.karotz.actionhandler;
 
 import hudson.ExtensionPoint;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
+import org.jenkinsci.plugins.karotz.KarotzException;
 
 /**
  * karotz Handler.
