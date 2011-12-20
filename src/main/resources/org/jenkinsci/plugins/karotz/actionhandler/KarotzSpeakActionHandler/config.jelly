@@ -1,0 +1,21 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:entry title="${%Lang}" field="lang">
+        <f:select style="width:30ex;" />
+    </f:entry>
+    <f:entry title="${%Text for Starting Build}" field="startText">
+        <f:textbox />
+    </f:entry>
+    <f:entry title="${%Text for Sucess}" field="successText">
+        <f:textbox />
+    </f:entry>
+    <f:entry title="${%Text for Failure}" field="failureText">
+        <f:textbox />
+    </f:entry>
+    <f:entry title="${%Text for Unstable}" field="unstableText">
+        <f:textbox />
+    </f:entry>
+    <f:entry title="${%Text for Recover}" field="recoverText">
+        <f:textbox />
+    </f:entry>
+</j:jelly>
