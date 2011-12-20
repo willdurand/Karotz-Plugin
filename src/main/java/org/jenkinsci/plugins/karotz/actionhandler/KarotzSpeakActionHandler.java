@@ -28,7 +28,6 @@ import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.karotz.KarotzException;
 import org.jenkinsci.plugins.karotz.action.LedColor;
 import org.jenkinsci.plugins.karotz.action.LedFadeAction;
@@ -54,40 +53,86 @@ public class KarotzSpeakActionHandler extends KarotzActionHandler {
 
     private static final String RECOVER_TEXT = "Project ${JOB_NAME} recovered at build ${BUILD_NUMBER}";
 
+    /**
+     * the language of the text to say
+     */
     private String lang;
 
+    /**
+     * Text to speak when the build has started.
+     */
     private String startText;
 
+    /**
+     * Text to speak for the build is successful.
+     */
     private String successText;
 
+    /**
+     * Text to speak when the build has unfortunatelly failed.
+     */
     private String failureText;
 
+    /**
+     * Text to speak when the build is unstable.
+     */
     private String unstableText;
 
+    /**
+     * Text to speak when the build has recover success.
+     */
     private String recoverText;
 
-    private KarotzActionHandlerDescriptor descriptor = Jenkins.getInstance().getDescriptorByType(KarotzSpeakActionHandler.DescriptorImpl.class);
-
+    /**
+     * Gets the language of the text to say.
+     *
+     * @return language
+     */
     public String getLang() {
         return lang;
     }
 
+    /**
+     * Gets the text to speak when the build has started.
+     *
+     * @return the text
+     */
     public String getStartText() {
         return startText;
     }
 
+    /**
+     * Gets the text to speak when the build is successfull.
+     *
+     * @return the text
+     */
     public String getSuccessText() {
         return successText;
     }
 
+    /**
+     * Gets the text to speak when the build is failed.
+     *
+     * @return the text
+     */
     public String getFailureText() {
         return failureText;
     }
 
+    /**
+     * Gets the text to speak when the build is unstable.
+     *
+     * @return the text
+     */
     public String getUnstableText() {
         return unstableText;
     }
 
+    /**
+     * Gets the text to speak when the build has recover success.
+     *
+     * @return the text
+     */
     public String getRecoverText() {
         return recoverText;
     }
