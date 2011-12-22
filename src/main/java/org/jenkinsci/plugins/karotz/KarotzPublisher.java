@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.karotz;
 
-import org.jenkinsci.plugins.karotz.actionhandler.KarotzActionHandler;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.Util;
@@ -19,7 +18,8 @@ import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.karotz.actionhandler.KarotzDefaultActionHandler;
+import org.jenkinsci.plugins.karotz.eventhandler.KarotzDefaultEventHandler;
+import org.jenkinsci.plugins.karotz.eventhandler.KarotzEventHandler;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -47,7 +47,7 @@ public class KarotzPublisher extends Notifier {
         KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
         try {
             client.startInteractiveMode();
-            KarotzActionHandler handler = d.getActionHandler();
+            KarotzEventHandler handler = d.getEventHandler();
             handler.onStart(build, listener);
         } catch (KarotzException ex) {
             return true;
@@ -63,7 +63,7 @@ public class KarotzPublisher extends Notifier {
         KarotzClient client = new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
         try {
             client.startInteractiveMode();
-            KarotzActionHandler handler = d.getActionHandler();
+            KarotzEventHandler handler = d.getEventHandler();
             fire(handler, build, listener);
         } catch (KarotzException ex) {
             listener.getLogger().println(ex);
@@ -73,7 +73,7 @@ public class KarotzPublisher extends Notifier {
         return true;
     }
 
-    private void fire(KarotzActionHandler handler, AbstractBuild<?, ?> build, BuildListener listener)
+    private void fire(KarotzEventHandler handler, AbstractBuild<?, ?> build, BuildListener listener)
             throws KarotzException {
         if (build.getResult() == Result.FAILURE) {
             handler.onFailure(build, listener);
@@ -106,7 +106,7 @@ public class KarotzPublisher extends Notifier {
 
         private String installId;
 
-        private KarotzActionHandler actionHandler;
+        private KarotzEventHandler eventHandler;
 
         public String getApiKey() {
             return apiKey;
@@ -120,8 +120,8 @@ public class KarotzPublisher extends Notifier {
             return installId;
         }
 
-        public KarotzActionHandler getActionHandler() {
-            return actionHandler;
+        public KarotzEventHandler getEventHandler() {
+            return eventHandler;
         }
 
         public KarotzPublisherDescriptor() {
@@ -137,11 +137,11 @@ public class KarotzPublisher extends Notifier {
                 throw new FormException("API Key, Secret Key and Install ID are mandatory.", apiKey);
             }
 
-            KarotzActionHandler h = req.bindJSON(KarotzActionHandler.class, json.optJSONObject("actionHandler"));
+            KarotzEventHandler h = req.bindJSON(KarotzEventHandler.class, json.optJSONObject("eventHandler"));
             if (h == null) {
-                actionHandler = new KarotzDefaultActionHandler();
+                eventHandler = new KarotzDefaultEventHandler();
             } else {
-                actionHandler = h;
+                eventHandler = h;
             }
 
             save();

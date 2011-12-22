@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jenkinsci.plugins.karotz.actionhandler;
+package org.jenkinsci.plugins.karotz.eventhandler;
 
 import hudson.ExtensionPoint;
 import hudson.model.AbstractBuild;
@@ -31,11 +31,11 @@ import hudson.model.Descriptor;
 import org.jenkinsci.plugins.karotz.KarotzException;
 
 /**
- * karotz Handler.
+ * karotz Event Handler.
  *
  * @author Seiji Sogabe
  */
-public abstract class KarotzActionHandler extends AbstractDescribableImpl<KarotzActionHandler>
+public abstract class KarotzEventHandler extends AbstractDescribableImpl<KarotzEventHandler>
         implements ExtensionPoint {
 
     /**
@@ -79,7 +79,7 @@ public abstract class KarotzActionHandler extends AbstractDescribableImpl<Karotz
     public abstract void onUnstable(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException;
 
     @Override
-    public Descriptor<KarotzActionHandler> getDescriptor() {
-        return (KarotzActionHandlerDescriptor) super.getDescriptor();
+    public Descriptor<KarotzEventHandler> getDescriptor() {
+        return (KarotzEventHandlerDescriptor) super.getDescriptor();
     }
 }

@@ -10,7 +10,7 @@
         <f:entry title="${%Install ID}" field="installId">
             <f:textbox />
         </f:entry>
-        <f:dropdownDescriptorSelector title="${%Action Handler}" field="actionHandler"/>
+        <f:dropdownDescriptorSelector title="${%EventHandler}" field="eventHandler"/>
         <f:advanced>
             <f:validateButton
                 title="${%Start interactive mode}" progress="${%Start interactive mode...}"

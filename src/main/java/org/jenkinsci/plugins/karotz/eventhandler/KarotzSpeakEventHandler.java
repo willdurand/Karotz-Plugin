@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jenkinsci.plugins.karotz.actionhandler;
+package org.jenkinsci.plugins.karotz.eventhandler;
 
 import hudson.Extension;
 import hudson.Util;
@@ -37,11 +37,11 @@ import org.jenkinsci.plugins.karotz.action.SpeakAction;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
- * KarotzSpeakActionHandler.
+ * KarotzSpeakEventHandler.
  *
  * @author Seiji Sogabe
  */
-public class KarotzSpeakActionHandler extends KarotzActionHandler {
+public class KarotzSpeakEventHandler extends KarotzEventHandler {
 
     private static final String START_TEXT = "The build ${BUILD_NUMBER} of project ${JOB_NAME} has started";
 
@@ -138,7 +138,7 @@ public class KarotzSpeakActionHandler extends KarotzActionHandler {
     }
 
     @DataBoundConstructor
-    public KarotzSpeakActionHandler(String lang, String startText, String successText,
+    public KarotzSpeakEventHandler(String lang, String startText, String successText,
             String failureText, String unstableText, String recoverText) {
         this.lang = lang;
         this.startText = Util.fixEmptyAndTrim(startText) != null ? startText : START_TEXT;
@@ -215,11 +215,11 @@ public class KarotzSpeakActionHandler extends KarotzActionHandler {
     }
 
     @Extension
-    public static class DescriptorImpl extends KarotzActionHandlerDescriptor {
+    public static class DescriptorImpl extends KarotzEventHandlerDescriptor {
 
         @Override
         public String getDisplayName() {
-            return "Customizable Speak ActionHandler";
+            return "Customizable Speak EventHandler";
         }
 
         public ListBoxModel doFillLangItems() {

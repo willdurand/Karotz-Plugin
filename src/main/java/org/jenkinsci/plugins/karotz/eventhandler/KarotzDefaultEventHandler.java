@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jenkinsci.plugins.karotz.actionhandler;
+package org.jenkinsci.plugins.karotz.eventhandler;
 
 import hudson.Extension;
 import hudson.model.AbstractBuild;
@@ -35,14 +35,14 @@ import org.jenkinsci.plugins.karotz.action.SpeakAction;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
- * KarotzDefaultActionHandler.
+ * KarotzDefaultEventHandler.
  *
  * @author Seiji Sogabe
  */
-public class KarotzDefaultActionHandler extends KarotzActionHandler {
+public class KarotzDefaultEventHandler extends KarotzEventHandler {
 
     @DataBoundConstructor
-    public KarotzDefaultActionHandler() {
+    public KarotzDefaultEventHandler() {
     }
 
     /**
@@ -117,11 +117,11 @@ public class KarotzDefaultActionHandler extends KarotzActionHandler {
     }
 
     @Extension
-    public static class DescriptorImpl extends KarotzActionHandlerDescriptor {
+    public static class DescriptorImpl extends KarotzEventHandlerDescriptor {
 
         @Override
         public String getDisplayName() {
-            return "Default ActionHandler";
+            return "Default EventHandler";
         }
     }
 }

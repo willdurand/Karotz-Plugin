@@ -21,22 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jenkinsci.plugins.karotz.actionhandler;
+package org.jenkinsci.plugins.karotz.eventhandler;
 
 import hudson.model.Descriptor;
 
 /**
- * Descriptor for {@link KarotzActionHandler}.
+ * Descriptor for {@link KarotzEventHandler}.
  *
  * @author Seiji Sogabe <s.sogabe@gmail.com>
  */
-public abstract class KarotzActionHandlerDescriptor extends Descriptor<KarotzActionHandler> {
+public abstract class KarotzEventHandlerDescriptor extends Descriptor<KarotzEventHandler> {
 
-    protected KarotzActionHandlerDescriptor(Class<? extends KarotzActionHandler> clazz) {
+    protected KarotzEventHandlerDescriptor(Class<? extends KarotzEventHandler> clazz) {
         super(clazz);
     }
 
-    protected KarotzActionHandlerDescriptor() {
+    protected KarotzEventHandlerDescriptor() {
     }
 
 }
