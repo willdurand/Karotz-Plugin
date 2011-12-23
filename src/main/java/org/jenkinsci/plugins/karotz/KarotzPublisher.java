@@ -20,6 +20,7 @@ import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.karotz.eventhandler.KarotzDefaultEventHandler;
 import org.jenkinsci.plugins.karotz.eventhandler.KarotzEventHandler;
+import org.jenkinsci.plugins.karotz.eventhandler.KarotzEventHandlerDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -122,6 +123,10 @@ public class KarotzPublisher extends Notifier {
 
         public KarotzEventHandler getEventHandler() {
             return eventHandler;
+        }
+
+        public KarotzEventHandlerDescriptor getDefaultEventHandler() {
+            return Jenkins.getInstance().getDescriptorByType(KarotzDefaultEventHandler.DescriptorImpl.class);
         }
 
         public KarotzPublisherDescriptor() {
