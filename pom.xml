@@ -8,9 +8,25 @@
     </parent>
 
     <artifactId>karotz</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Jenkins Karotz plugin</name>
+    <description>Publish build results to your Karotz</description>
+    <url>http://wiki.jenkins-ci.org/display/JENKINS/Karotz+Plugin</url>
+
+    <developers>
+        <developer>
+            <id>sogabe</id>
+            <name>Seiji Sogabe</name>
+            <email>s.sogabe@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/jenkinsci/karotz-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/karotz-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/karotz-plugin</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
