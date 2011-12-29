@@ -20,6 +20,11 @@
             <name>Seiji Sogabe</name>
             <email>s.sogabe@gmail.com</email>
         </developer>
+        <developer>
+            <id>couac</id>
+            <name>William Durand</name>
+            <email>william.durand1@gmail.com</email>
+        </developer>
     </developers>
 
     <scm>
