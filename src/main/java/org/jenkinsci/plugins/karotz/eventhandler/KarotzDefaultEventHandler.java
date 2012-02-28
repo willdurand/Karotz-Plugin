@@ -108,7 +108,7 @@ public class KarotzDefaultEventHandler extends KarotzEventHandler {
      */
     @Override
     public void onSuccess(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
-        String tts = "Success of build ${BUILD_NUMBER} in project ${JOB_NAMe}";
+        String tts = "Success of build ${BUILD_NUMBER} in project ${JOB_NAME}";
         for (int i = 5; i > 0; i--) {
             new LedOffAction().execute(build, listener);
             new LedLightAction(LedColor.BLUE).execute(build, listener);
