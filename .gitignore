@@ -2,4 +2,5 @@ target/
 work/
 .hibernateSynchronizer
 .DS_Store
+org/miquelmartin/
 
