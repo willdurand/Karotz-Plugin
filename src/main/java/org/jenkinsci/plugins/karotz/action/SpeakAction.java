@@ -23,65 +23,86 @@
  */
 package org.jenkinsci.plugins.karotz.action;
 
-import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.jenkinsci.plugins.karotz.KarotzException;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 
 /**
  * SpeakAction.
- *
+ * 
  * @author Seiji Sogabe
  */
 public class SpeakAction extends KarotzAction {
 
-    private String textToSpeak;
+	/**
+	 * Number of milliseconds it takes the Karotz to pronounce one letter.
+	 * Naturally, this is approximate, and is just meant to ensure the Karotz
+	 * doesn't exit interactive mode mid-sentence.
+	 */
+	private static final int LETTER_DURATION = 120;
 
-    private String language;
+	private String textToSpeak;
 
-    public SpeakAction(String textToSpeak) {
-        this(textToSpeak, "EN");
-    }
+	private final String language;
 
-    public SpeakAction(String textToSpeak, String language) {
-        this.textToSpeak = textToSpeak;
-        this.language = language;
-    }
+	private final int duration;
 
-    public String getBaseUrl() {
-        return "http://api.karotz.com/api/karotz/tts";
-    }
+	public SpeakAction(String textToSpeak) {
+		this(textToSpeak, "EN");
+	}
 
-    public Map<String, String> getParameters() {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("action", "speak");
-        params.put("lang", language);
-        params.put("text", textToSpeak);
-        return params;
-    }
+	public SpeakAction(String textToSpeak, String language) {
+		this.textToSpeak = textToSpeak;
+		this.language = language;
+		this.duration = textToSpeak.length() * LETTER_DURATION;
+	}
 
-    @Override
-    public void execute(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
-        try {
-            textToSpeak = TokenMacro.expandAll(build, listener, textToSpeak);
-        } catch (MacroEvaluationException ex) {
-            LOGGER.log(Level.WARNING, "Build variables seem to be invalid", ex);
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "IO Error", ex);
-        } catch (InterruptedException ex) {
-            LOGGER.log(Level.WARNING, "Interrupted", ex);
-        }
-        super.execute(build, listener);
-    }
+	@Override
+	public String getBaseUrl() {
+		return "http://api.karotz.com/api/karotz/tts";
+	}
 
-    /**
-     * Logger
-     */
-    protected static final Logger LOGGER = Logger.getLogger(SpeakAction.class.getName());
+	@Override
+	public Map<String, String> getParameters() {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("action", "speak");
+		params.put("lang", language);
+		params.put("text", textToSpeak);
+		return params;
+	}
+
+	@Override
+	public void execute(AbstractBuild<?, ?> build, BuildListener listener)
+			throws KarotzException {
+		try {
+			textToSpeak = TokenMacro.expandAll(build, listener, textToSpeak);
+		} catch (MacroEvaluationException ex) {
+			LOGGER.log(Level.WARNING, "Build variables seem to be invalid", ex);
+		} catch (IOException ex) {
+			LOGGER.log(Level.WARNING, "IO Error", ex);
+		} catch (InterruptedException ex) {
+			LOGGER.log(Level.WARNING, "Interrupted", ex);
+		}
+		super.execute(build, listener);
+	}
+
+	/**
+	 * Logger
+	 */
+	protected static final Logger LOGGER = Logger.getLogger(SpeakAction.class
+			.getName());
+
+	@Override
+	public long getDuration() {
+		return duration;
+	}
 }

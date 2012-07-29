@@ -23,116 +23,129 @@
  */
 package org.jenkinsci.plugins.karotz.action;
 
-import hudson.model.AbstractBuild;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import org.jenkinsci.plugins.karotz.KarotzClient;
 import org.jenkinsci.plugins.karotz.KarotzException;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
 
 /**
  * Test for KarotzAction
- *
+ * 
  * @author Seiji Sogabe <s.sogabe@gmail.com>
  */
 public class KarotzActionTest {
 
-    /**
-     * Test of execute method, of class KarotzAction.
-     */
-    @Test(expected = KarotzException.class)
-    public void testExecute_BuildIsNull() throws Exception {
-        // Mock setup
-        AbstractBuild<?, ?> build = null;
-        BuildListener listener = mock(BuildListener.class);
-        KarotzAction target = new MockKarotzAction();
+	/**
+	 * Test of execute method, of class KarotzAction.
+	 */
+	@Test(expected = KarotzException.class)
+	public void testExecute_BuildIsNull() throws Exception {
+		// Mock setup
+		AbstractBuild<?, ?> build = null;
+		BuildListener listener = mock(BuildListener.class);
+		KarotzAction target = new MockKarotzAction();
 
-        target.execute(build, listener);
-    }
+		target.execute(build, listener);
+	}
 
-    /**
-     * Test of execute method, of class KarotzAction.
-     */
-    @Test(expected = KarotzException.class)
-    public void testExecute_ListenerIsNull() throws Exception {
-        // Mock setup
-        AbstractBuild<?, ?> build = mock(AbstractBuild.class);
-        BuildListener listener = null;
-        KarotzAction target = new MockKarotzAction();
+	/**
+	 * Test of execute method, of class KarotzAction.
+	 */
+	@Test(expected = KarotzException.class)
+	public void testExecute_ListenerIsNull() throws Exception {
+		// Mock setup
+		AbstractBuild<?, ?> build = mock(AbstractBuild.class);
+		BuildListener listener = null;
+		KarotzAction target = new MockKarotzAction();
 
-        target.execute(build, listener);
-    }
+		target.execute(build, listener);
+	}
 
-    /**
-     * Test of execute method, of class KarotzAction.
-     */
-    @Test
-    public void testExecute_NoInteractive() throws Exception {
-        // Mock setup
-        AbstractBuild<?, ?> build = mock(AbstractBuild.class);
-        BuildListener listener = mock(BuildListener.class);
+	/**
+	 * Test of execute method, of class KarotzAction.
+	 */
+	@Test
+	public void testExecute_NoInteractive() throws Exception {
+		// Mock setup
+		AbstractBuild<?, ?> build = mock(AbstractBuild.class);
+		BuildListener listener = mock(BuildListener.class);
 
-        final KarotzClient clientMock = mock(KarotzClient.class);
-        when(clientMock.isInteractive()).thenReturn(false);
-        KarotzAction target = spy(new MockKarotzAction());
-        doReturn(clientMock).when(target).getClient();
+		final KarotzClient clientMock = mock(KarotzClient.class);
+		when(clientMock.isInteractive()).thenReturn(false);
+		KarotzAction target = spy(new MockKarotzAction());
+		doReturn(clientMock).when(target).getClient();
 
-        target.execute(build, listener);
-        verify(target, times(0)).getParameters();
-    }
+		target.execute(build, listener);
+		verify(target, times(0)).getParameters();
+	}
 
-    /**
-     * Test of execute method, of class KarotzAction.
-     */
-    @Test
-    public void testExecute() throws Exception {
-        // Mock setup
-        AbstractBuild<?, ?> build = mock(AbstractBuild.class);
-        BuildListener listener = mock(BuildListener.class);
+	/**
+	 * Test of execute method, of class KarotzAction.
+	 */
+	@Test
+	public void testExecute() throws Exception {
+		// Mock setup
+		AbstractBuild<?, ?> build = mock(AbstractBuild.class);
+		BuildListener listener = mock(BuildListener.class);
 
-        final KarotzClient clientMock = mock(KarotzClient.class);
-        when(clientMock.isInteractive()).thenReturn(true);
-        when(clientMock.getInteractiveId()).thenReturn(anyString());
-        when(clientMock.parseResponse(anyString(), "code")).thenReturn("OK");
-        KarotzAction target = spy(new MockKarotzAction());
-        doReturn(clientMock).when(target).getClient();
+		final KarotzClient clientMock = mock(KarotzClient.class);
+		when(clientMock.isInteractive()).thenReturn(true);
+		when(clientMock.getInteractiveId()).thenReturn(anyString());
+		when(clientMock.parseResponse(anyString(), "code")).thenReturn("OK");
+		KarotzAction target = spy(new MockKarotzAction());
+		doReturn(clientMock).when(target).getClient();
 
-        target.execute(build, listener);
-    }
+		target.execute(build, listener);
+	}
 
-    /**
-     * Test of execute method, of class KarotzAction.
-     */
-    @Test(expected=KarotzException.class)
-    public void testExecute_ReturnNG() throws Exception {
-        // Mock setup
-        AbstractBuild<?, ?> build = mock(AbstractBuild.class);
-        BuildListener listener = mock(BuildListener.class);
+	/**
+	 * Test of execute method, of class KarotzAction.
+	 */
+	@Test(expected = KarotzException.class)
+	public void testExecute_ReturnNG() throws Exception {
+		// Mock setup
+		AbstractBuild<?, ?> build = mock(AbstractBuild.class);
+		BuildListener listener = mock(BuildListener.class);
 
-        final KarotzClient clientMock = mock(KarotzClient.class);
-        when(clientMock.isInteractive()).thenReturn(true);
-        when(clientMock.getInteractiveId()).thenReturn(anyString());
-        when(clientMock.parseResponse(anyString(), "code")).thenReturn("ERROR");
-        KarotzAction target = spy(new MockKarotzAction());
-        doReturn(clientMock).when(target).getClient();
+		final KarotzClient clientMock = mock(KarotzClient.class);
+		when(clientMock.isInteractive()).thenReturn(true);
+		when(clientMock.getInteractiveId()).thenReturn(anyString());
+		when(clientMock.parseResponse(anyString(), "code")).thenReturn("ERROR");
+		KarotzAction target = spy(new MockKarotzAction());
+		doReturn(clientMock).when(target).getClient();
 
-        target.execute(build, listener);
-    }
+		target.execute(build, listener);
+	}
 
-    private static class MockKarotzAction extends KarotzAction {
+	private static class MockKarotzAction extends KarotzAction {
 
-        @Override
-        public String getBaseUrl() {
-            return "url";
-        }
+		@Override
+		public String getBaseUrl() {
+			return "url";
+		}
 
-        @Override
-        public Map<String, String> getParameters() {
-            Map<String, String> m = new HashMap<String, String>();
-            m.put("action", "speak");
-            return m;
-        }
-    }
+		@Override
+		public Map<String, String> getParameters() {
+			Map<String, String> m = new HashMap<String, String>();
+			m.put("action", "speak");
+			return m;
+		}
+
+		@Override
+		public long getDuration() {
+			return 0;
+		}
+	}
 }

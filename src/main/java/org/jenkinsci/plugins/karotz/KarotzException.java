@@ -25,42 +25,48 @@ package org.jenkinsci.plugins.karotz;
 
 /**
  * Karotz Exception.
- *
+ * 
  * @author Seiji Sogabe
  */
 public class KarotzException extends Exception {
 
-    /**
-     * Constructor.
-     *
-     * @param cause the cause
-     */
-    public KarotzException(Throwable cause) {
-        super(cause);
-    }
+	private static final long serialVersionUID = 591332023257268967L;
 
-    /**
-     * Constructor.
-     *
-     * @param message the detail message
-     * @param cause the cause
-     */
-    public KarotzException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	/**
+	 * Constructor.
+	 * 
+	 * @param cause
+	 *            the cause
+	 */
+	public KarotzException(Throwable cause) {
+		super(cause);
+	}
 
-    /**
-     * Constructor.
-     *
-     * @param message the detail message
-     */
-    public KarotzException(String message) {
-        super(message);
-    }
+	/**
+	 * Constructor.
+	 * 
+	 * @param message
+	 *            the detail message
+	 * @param cause
+	 *            the cause
+	 */
+	public KarotzException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    /**
-     * Constructor.
-     */
-    public KarotzException() {
-    }
+	/**
+	 * Constructor.
+	 * 
+	 * @param message
+	 *            the detail message
+	 */
+	public KarotzException(String message) {
+		super(message);
+	}
+
+	/**
+	 * Constructor.
+	 */
+	public KarotzException() {
+	}
 }

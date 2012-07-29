@@ -28,31 +28,38 @@ import java.util.Map;
 
 /**
  * Led Light Action.
- *
+ * 
  * @author Seiji Sogabe
  */
 public class LedLightAction extends KarotzAction {
 
-    private String color;
+	private final String color;
 
-    public LedLightAction(String color) {
-        this.color = color;
-    }
+	public LedLightAction(String color) {
+		this.color = color;
+	}
 
-    public LedLightAction(LedColor color) {
-        this(color.getCode());
-    }
+	public LedLightAction(LedColor color) {
+		this(color.getCode());
+	}
 
-    public String getBaseUrl() {
-        return "http://api.karotz.com/api/karotz/led";
-    }
+	@Override
+	public String getBaseUrl() {
+		return "http://api.karotz.com/api/karotz/led";
+	}
 
-    public Map<String, String> getParameters() {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("action", "light");
-        if (color != null) {
-            params.put("color", color);
-        }
-        return params;
-    }
+	@Override
+	public Map<String, String> getParameters() {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("action", "light");
+		if (color != null) {
+			params.put("color", color);
+		}
+		return params;
+	}
+
+	@Override
+	public long getDuration() {
+		return 0;
+	}
 }
