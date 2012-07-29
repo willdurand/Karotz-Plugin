@@ -1,6 +1,5 @@
 target/
 work/
-.settings/
-.project
-.classpath
 .hibernateSynchronizer
+.DS_Store
+
