@@ -28,18 +28,26 @@ import java.util.Map;
 
 /**
  * Led Light Action.
- *
+ * 
  * @author Seiji Sogabe
  */
 public class LedOffAction extends KarotzAction {
 
-    public String getBaseUrl() {
-        return "http://api.karotz.com/api/karotz/led";
-    }
+	@Override
+	public String getBaseUrl() {
+		return "http://api.karotz.com/api/karotz/led";
+	}
 
-    public Map<String, String> getParameters() {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("action", "light");
-        return params;
-    }
+	@Override
+	public Map<String, String> getParameters() {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("action", "light");
+		return params;
+	}
+
+	@Override
+	public long getDuration() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

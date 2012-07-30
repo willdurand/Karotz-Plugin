@@ -23,10 +23,15 @@
  */
 package org.jenkinsci.plugins.karotz.action;
 
-import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jenkins.model.Jenkins;
+
 import org.jenkinsci.plugins.karotz.KarotzClient;
 import org.jenkinsci.plugins.karotz.KarotzException;
 import org.jenkinsci.plugins.karotz.KarotzPublisher;
@@ -34,39 +39,62 @@ import org.jenkinsci.plugins.karotz.KarotzUtil;
 
 /**
  * karotz Action
- *
+ * 
  * @author Seiji Sogabe
  */
 public abstract class KarotzAction {
+	/**
+	 * Logger
+	 */
+	private static final Logger LOGGER = Logger.getLogger(KarotzAction.class
+			.getName());
 
-    public abstract String getBaseUrl();
+	public abstract String getBaseUrl();
 
-    public abstract Map<String, String> getParameters();
+	public abstract Map<String, String> getParameters();
 
-    public void execute(AbstractBuild<?, ?> build, BuildListener listener) throws KarotzException {
-        if (build == null || listener == null) {
-            throw new KarotzException("build and listener should be not null");
-        }
+	/**
+	 * Get the duration of the action, used to calculate how long the client
+	 * should wait before stopping the Interactive Mode, which cancels all
+	 * running actions.
+	 * 
+	 * @return the number of milliseconds this action will take
+	 */
+	public abstract long getDuration();
 
-        KarotzClient client = getClient();
-        if (!client.isInteractive()) {
-            return;
-        }
+	public void execute(AbstractBuild<?, ?> build, BuildListener listener)
+			throws KarotzException {
+		if (build == null || listener == null) {
+			throw new KarotzException("build and listener should be not null");
+		}
+		KarotzClient client = getClient();
+		execute(client);
+	}
 
-        Map<String, String> params = getParameters();
-        params.put("interactiveid", client.getInteractiveId());
-        String url = getBaseUrl() + '?' + KarotzUtil.buildQuery(params);
+	public void execute(KarotzClient client) throws KarotzException {
 
-        String result = client.doRequest(url);
-        String code = client.parseResponse(result, "code");
-        if (!"OK".equalsIgnoreCase(code)) {
-            throw new KarotzException("failed to do action: " + code);
-        }
-    }
+		if (!client.isInteractive()) {
+			return;
+		}
 
-    protected KarotzClient getClient() {
-        KarotzPublisher.KarotzPublisherDescriptor d
-                = Jenkins.getInstance().getDescriptorByType(KarotzPublisher.KarotzPublisherDescriptor.class);
-        return new KarotzClient(d.getApiKey(), d.getSecretKey(), d.getInstallId());
-    }
+		Map<String, String> params = getParameters();
+		params.put("interactiveid", client.getInteractiveId());
+		String url = getBaseUrl() + '?' + KarotzUtil.buildQuery(params);
+		client.addActionDuration(getDuration());
+		String result = client.doRequest(url);
+		String code = client.parseResponse(result, "code");
+		if (!"OK".equalsIgnoreCase(code)) {
+			throw new KarotzException("failed to do action: " + code);
+		}
+		LOGGER.log(Level.INFO, "Success.", result);
+
+	}
+
+	protected KarotzClient getClient() {
+		KarotzPublisher.KarotzPublisherDescriptor d = Jenkins.getInstance()
+				.getDescriptorByType(
+						KarotzPublisher.KarotzPublisherDescriptor.class);
+		return new KarotzClient(d.getApiKey(), d.getSecretKey(),
+				d.getInstallId());
+	}
 }

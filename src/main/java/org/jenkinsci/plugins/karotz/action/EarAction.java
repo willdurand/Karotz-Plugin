@@ -29,37 +29,60 @@ import java.util.Map;
 /**
  * Led Light Action.
  * 
- * @author Seiji Sogabe
+ * @author Miquel Martin
  */
-public class LedLightAction extends KarotzAction {
+public class EarAction extends KarotzAction {
 
-	private final String color;
+	private static final int EAR_RESET_TIME = 2500;
+	private Integer right;
+	private Integer left;
+	private Boolean relative;
+	private Boolean reset;
 
-	public LedLightAction(String color) {
-		this.color = color;
+	public EarAction() {
+		this.reset = true;
 	}
 
-	public LedLightAction(LedColor color) {
-		this(color.getCode());
+	/**
+	 * Move the karotz ears to an absolute position.
+	 * 
+	 * @param left
+	 *            if not null, indicates the desired position.
+	 * @param right
+	 *            if not null, indicates the desired position.
+	 */
+	public EarAction(Integer left, Integer right, boolean relative) {
+		this.left = left;
+		this.right = right;
+		this.relative = relative;
 	}
 
 	@Override
 	public String getBaseUrl() {
-		return "http://api.karotz.com/api/karotz/led";
+		return "http://api.karotz.com/api/karotz/ears";
 	}
 
 	@Override
 	public Map<String, String> getParameters() {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("action", "light");
-		if (color != null) {
-			params.put("color", color);
+		if (reset != null) {
+			params.put("reset", reset.toString());
+		} else {
+			if (left != null) {
+				params.put("left", left.toString());
+			}
+			if (right != null) {
+				params.put("right", right.toString());
+			}
+			if (relative != null) {
+				params.put("relative", relative.toString());
+			}
 		}
 		return params;
 	}
 
 	@Override
 	public long getDuration() {
-		return 0;
+		return EAR_RESET_TIME;
 	}
 }
