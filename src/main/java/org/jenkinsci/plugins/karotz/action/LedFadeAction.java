@@ -28,33 +28,40 @@ import java.util.Map;
 
 /**
  * Led Light Action.
- *
+ * 
  * @author Seiji Sogabe
  */
 public class LedFadeAction extends KarotzAction {
 
-    private String color;
+	private final String color;
 
-    private long period;
+	private final long period;
 
-    public LedFadeAction(String color, long period) {
-        this.color = color;
-        this.period = period;
-    }
+	public LedFadeAction(String color, long period) {
+		this.color = color;
+		this.period = period;
+	}
 
-    public LedFadeAction(LedColor color, long period) {
-        this(color.getCode(), period);
-    }
+	public LedFadeAction(LedColor color, long period) {
+		this(color.getCode(), period);
+	}
 
-    public String getBaseUrl() {
-        return "http://api.karotz.com/api/karotz/led";
-    }
+	@Override
+	public String getBaseUrl() {
+		return "http://api.karotz.com/api/karotz/led";
+	}
 
-    public Map<String, String> getParameters() {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("action", "fade");
-        params.put("color", color);
-        params.put("period", String.valueOf(period));
-        return params;
-    }
+	@Override
+	public Map<String, String> getParameters() {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("action", "fade");
+		params.put("color", color);
+		params.put("period", String.valueOf(period));
+		return params;
+	}
+
+	@Override
+	public long getDuration() {
+		return period;
+	}
 }
